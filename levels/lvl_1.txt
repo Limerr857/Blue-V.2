@@ -18,10 +18,11 @@
 
 # slice 1
 "img/Backdrops/Level_1_background_1.png"
-[[0, 500, 500], [0, 1000, 1000]]
+[[0, 500, 500], [0, 1000, 970]]
 
 # slice 2
 "img/Backdrops/Level_1_background_2.png"
+[[0, 300, 500], [0, 190, 435]]
 
 # slice 3
 "img/Backdrops/Level_1_background_3.png"

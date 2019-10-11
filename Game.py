@@ -39,6 +39,9 @@ Load_game_isdisabled = img.load("img/Load_game_isdisabled.png").convert_alpha()
 player = img.load("img/player_normal.png").convert_alpha()
 
 
+objects_group = pygame.sprite.Group()
+
+
 class Level():
     #                              should be number
     def get_background(self, name, slice_):
