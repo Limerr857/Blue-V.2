@@ -1,0 +1,46 @@
+[3, 3]
+1
+[300, 800]
+# this ^ is formatted like this V
+
+#1 level_size
+#2 start_slice
+#3 start_pos
+
+
+
+# Format goes like this:
+
+# slice n
+# path to background
+# objects [type, x, y]
+
+
+# slice 1
+"img/Backdrops/Level_1_background_1.png"
+[[0, 500, 500], [0, 1000, 1000]]
+
+# slice 2
+"img/Backdrops/Level_1_background_2.png"
+
+# slice 3
+"img/Backdrops/Level_1_background_3.png"
+
+# slice 4
+"img/Backdrops/Level_1_background_4.png"
+
+# slice 5
+"img/Backdrops/Level_1_background_5.png"
+
+# slice 6
+"img/Backdrops/Level_1_background_6.png"
+
+# slice 7
+"img/Backdrops/Level_1_background_7.png"
+
+# slice 8
+"img/Backdrops/Level_1_background_8.png"
+
+# slice 9
+"img/Backdrops/Level_1_background_9.png"
+
