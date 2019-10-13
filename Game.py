@@ -14,6 +14,8 @@ Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
 object_list = ["img/Objects/rock_1.png"]
+player_width = 100
+player_hight = 100
 
 x,y = 0,0
 
@@ -98,6 +100,20 @@ class Level():
                 found = 1
 
 lvl_1 = Level()
+
+class Player():
+
+    def __init__(self):
+        pass
+
+
+
+class object__(pygame.sprite.Sprite):
+    def __init__(self, type, location):
+        pass
+        # pygame.sprite.Sprite.__init__(self)
+        # self.size = self.get_rect().size
+        # print(self.size)
 
 
 def re_draw():
@@ -204,7 +220,19 @@ def re_draw():
         if Objects_empty == False:
             x = 1
             for i in object_list:
-                exec('object_1 = img.load("{}").convert_alpha()'.format(i), globals())
+                exec('object_{} = img.load("{}").convert_alpha()'.format(x, i), globals())
+                for i in Objects:
+                    z = 0
+                    for e in i:
+                        if z == 0:
+                            nr = e+1
+                        elif z == 1:
+                            x = e
+                        elif z == 2:
+                            y = e
+                            exec("object_{} = object__(0, ({}, {}))".format(nr, x, y))
+                        z += 1
+                
                 x += 1
             
 
