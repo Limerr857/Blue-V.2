@@ -114,9 +114,8 @@ class Object__(pygame.sprite.Sprite):
         self.type = type
         if type == 0:
             Rock_1.__init__(self)
-        if type == 0:
+        if type == 1:
             Rock_2.__init__(self)
-
         
     def setup(self):
         self.size = self.image.get_rect().size
@@ -126,11 +125,13 @@ class Rock_1(Object__):
     def __init__(self):
         self.image = img.load(object_list[0])
         self.setup()
+        self.rect = self.image.get_rect()
 
 class Rock_2(Object__):
     def __init__(self):
         self.image = img.load(object_list[1])
         self.setup()
+        self.rect = self.image.get_rect()
 
 def re_draw():
     global state
@@ -143,6 +144,7 @@ def re_draw():
     global ex_y
     global level_size
     global ex_background
+    global objects_group
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -216,13 +218,14 @@ def re_draw():
                             x = e
                         elif z == 2:
                             y = e
-                            exec("win.blit(object_{}, ({}, {}))".format(nr, x, y))
+                            exec("win.blit(object_{}.image, ({}, {}))".format(nr, x, y))
                         z += 1
                 
 
 
 
     elif state == "Explore_update":
+        objects_group = pygame.sprite.Group()
         Objects = level.get_objects(leveln, slice_)
         Objects_empty = False
         if Objects == "\n":
@@ -234,14 +237,12 @@ def re_draw():
         ex_background = img.load(ex_background).convert()
         ex_background.set_alpha(None)
         if Objects_empty == False:
-            x = 1
+            x_ = 1
             for i in object_list:
-                exec('object_{} = img.load("{}").convert_alpha()'.format(x, i), globals())
                 a = 0
                 for i in Objects:
                     z = 0
                     for e in i:
-                        print(e)
                         if z == 0:
                             nr = a+1
                             type_ = e
@@ -249,11 +250,12 @@ def re_draw():
                             x = e
                         elif z == 2:
                             y = e
-                            exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y))
+                            exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y), globals())
+                            exec("objects_group.add(object_{})".format(nr), globals())
                         z += 1
                     a += 1
                 
-                x += 1
+                x_ += 1
             
 
         state = "Explore"
