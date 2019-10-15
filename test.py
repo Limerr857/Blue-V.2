@@ -272,7 +272,7 @@ def re_draw():
         objects_group = pygame.sprite.Group()
         Objects = level.get_objects(leveln, slice_)
         Objects_empty = False
-        if Objects == "\n":
+        if Objects == "\n" or Objects == None:
             Objects_empty = True
         if Objects_empty == False:
             Objects = eval(Objects)
@@ -309,25 +309,35 @@ def re_draw():
             if i.rect.colliderect(player_):
                 print("Collided")
                 if came_from == "-x":
+                    print(slice_)
                     slice_ -= 1
+                    print(slice_)
                     prev_failed_key = "right"
-                    state = "Explore_update"
+                    state = "Explore_update_again"
                 elif came_from == "x":
+                    print(slice_)
                     slice_ += 1
+                    print(slice_)
                     prev_failed_key = "left"
-                    state = "Explore_update"
+                    state = "Explore_update_again"
                 elif came_from == "-y":
+                    print(slice_)
                     slice_ -= level_size[0]
+                    print(slice_)
                     prev_failed_key = "down"
-                    state = "Explore_update"
+                    state = "Explore_update_again"
                 elif came_from == "y":
+                    print(slice_)
                     slice_ += level_size[0]
+                    print(slice_)
                     prev_failed_key = "up"
-                    state = "Explore_update"
-
+                    state = "Explore_update_again"
+            break
             
-
-        state = "Explore"
+        if state != "Explore_update_again":
+            state = "Explore"
+        elif state == "Explore_update_again":
+            state = "Explore_update"
 
 
 
