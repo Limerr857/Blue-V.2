@@ -23,21 +23,23 @@ x,y = 0,0
 
 background = img.load("img/background.png").convert()
 background.set_alpha(None)
-Title = img.load("img/Title.png").convert_alpha()
-options = img.load("img/options.png").convert_alpha()
-play = img.load("img/play.png").convert_alpha()
-options_isselected = img.load("img/options_isselected.png").convert_alpha()
-play_isselected = img.load("img/play_isselected.png").convert_alpha()
+Title = img.load("img/menu/Title.png").convert_alpha()
+options = img.load("img/menu/options.png").convert_alpha()
+play = img.load("img/menu/play.png").convert_alpha()
+exit_ = img.load("img/menu/exit.png").convert_alpha()
+options_isselected = img.load("img/menu/options_isselected.png").convert_alpha()
+play_isselected = img.load("img/menu/play_isselected.png").convert_alpha()
+exit_isselected = img.load("img/menu/exit_isselected.png").convert_alpha()
 
-coming_soon = img.load("img/coming_soon.png").convert_alpha()
-go_back = img.load("img/go_back.png").convert_alpha()
-go_back_isselected = img.load("img/go_back_isselected.png").convert_alpha()
+coming_soon = img.load("img/menu/coming_soon.png").convert_alpha()
+go_back = img.load("img/menu/go_back.png").convert_alpha()
+go_back_isselected = img.load("img/menu/go_back_isselected.png").convert_alpha()
 
-New_game = img.load("img/New_game.png").convert_alpha()
-New_game_isselected = img.load("img/New_game_isselected.png").convert_alpha()
-Load_game = img.load("img/Load_game.png").convert_alpha()
-Load_game_isselected = img.load("img/Load_game_isselected.png").convert_alpha()
-Load_game_isdisabled = img.load("img/Load_game_isdisabled.png").convert_alpha()
+New_game = img.load("img/menu/New_game.png").convert_alpha()
+New_game_isselected = img.load("img/menu/New_game_isselected.png").convert_alpha()
+Load_game = img.load("img/menu/Load_game.png").convert_alpha()
+Load_game_isselected = img.load("img/menu/Load_game_isselected.png").convert_alpha()
+Load_game_isdisabled = img.load("img/menu/Load_game_isdisabled.png").convert_alpha()
 
 player = img.load("img/player_normal.png").convert_alpha()
 
@@ -193,12 +195,19 @@ def re_draw():
         if Title_selected == None:
             win.blit(play, (0,400))
             win.blit(options, (0,600))
+            win.blit(exit_, (0,800))
         elif Title_selected == "play":
             win.blit(play_isselected, (0,400))
             win.blit(options, (0,600))
+            win.blit(exit_, (0,800))
         elif Title_selected == "options":
             win.blit(play, (0,400))
             win.blit(options_isselected, (0,600))
+            win.blit(exit_, (0,800))
+        elif Title_selected == "exit":
+            win.blit(play, (0,400))
+            win.blit(options, (0,600))
+            win.blit(exit_isselected, (0,800))
 
     
     elif state == "Options":
@@ -236,8 +245,8 @@ def re_draw():
                 win.blit(New_game, (0,300))
             else:
                 win.blit(Load_game_isdisabled, (0,500))
-        
-    
+
+
     elif state == "Load_new":
         pass
 
@@ -264,9 +273,6 @@ def re_draw():
                         z += 1
                     b += 1
                 
-                
-
-
 
     elif state == "Explore_update":
         objects_group = pygame.sprite.Group()
@@ -347,6 +353,7 @@ def updates():
     global leveln
     global came_from
     global prev_failed_key
+    global run
     x, y = pygame.mouse.get_pos()
 
 
@@ -358,6 +365,8 @@ def updates():
                 Title_selected = "play"
             elif y > 600 and y < 800:
                 Title_selected = "options"
+            elif y > 800 and y < 1000:
+                Title_selected = "exit"
             else:
                 Title_selected = None
         else:
@@ -373,6 +382,8 @@ def updates():
             elif Title_selected == "options":
                 state = "Options"
                 Title_selected = None
+            elif Title_selected == "exit":
+                run = False
                 
 
     elif state == "Options":
@@ -391,6 +402,7 @@ def updates():
             if Options_selected == "go_back":
                 state = "Title"
                 Options_selected = None
+                time.sleep(0.1)
 
 
     elif state == "Play":
@@ -413,6 +425,7 @@ def updates():
             if Play_selected == "go_back":
                 state = "Title"
                 Play_selected = None
+                time.sleep(0.1)
             if Play_selected == "New_game":
                 state = "Load_new"
                 Play_selected = None
