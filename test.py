@@ -104,7 +104,31 @@ lvl_1 = Level()
 class Player():
 
     def __init__(self):
-        pass
+        self.image = img.load("img/player_normal.png").convert_alpha()
+        self.size = self.image.get_rect().size
+        self.rect = self.image.get_rect()
+
+    def Collide(self, group1):
+        global ex_x
+        global ex_y
+        global vel
+        if pygame.sprite.spritecollideany(self, group1) != None:
+            print("COLLISION!!!")
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                player_.rect.move_ip(0, vel)
+                #ex_y += vel
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                player_.rect.move_ip(vel, 0)
+                #ex_x += vel
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                player_.rect.move_ip(0, vel*-1)
+                #ex_y -= vel
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                player_.rect.move_ip(vel*-1, 0)
+                #ex_x -= vel
+
+player_ = Player()
 
 
 
@@ -119,7 +143,6 @@ class Object__(pygame.sprite.Sprite):
         
     def setup(self):
         self.size = self.image.get_rect().size
-        print(self.size)
 
 class Rock_1(Object__):
     def __init__(self):
@@ -207,7 +230,7 @@ def re_draw():
         global ex_background
         if player_state == "normal":
             win.blit(ex_background, (0,0))
-            win.blit(player, (ex_x,ex_y))
+            win.blit(player, player_.rect)
             if Objects_empty == False:
                 for i in Objects:
                     z = 0
@@ -220,6 +243,7 @@ def re_draw():
                             y = e
                             exec("win.blit(object_{}.image, ({}, {}))".format(nr, x, y))
                         z += 1
+                
                 
 
 
@@ -360,66 +384,71 @@ def updates():
 
     elif state == "Explore":
         if player_state == "normal":
+            global vel
             vel = 5
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
+                print(1)
+                player_.rect.move_ip(0, vel*-1)
                 ex_y -= vel
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                player_.rect.move_ip(vel*-1, 0)
                 ex_x -= vel
             if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                player_.rect.move_ip(0, vel)
                 ex_y += vel
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                player_.rect.move_ip(vel, 0)
                 ex_x += vel
-            if ex_x < 1820 and ex_y < 980 and ex_x > 0 and ex_y > 0:
+            if player_.rect.x < 1820 and player_.rect.y < 980 and player_.rect.x > 0 and player_.rect.y > 0:
                 pass
             else:
                 # You are off the screen
-                if ex_x > 1820:
+                if player_.rect.x > 1820:
                     if level_size == [1, 1]:
-                        ex_x -= vel
+                        player_.rect.x -= vel
                     else:
                         if slice_ % level_size[1] != 0:
                             slice_ += 1
-                            ex_x = 0
+                            player_.rect.x = 0
                             state = "Explore_update"
                         else:
-                            ex_x -= vel
-                elif ex_x < 0:
+                            player_.rect.x -= vel
+                elif player_.rect.x < 0:
                     if level_size == [1, 1]:
-                        ex_x += vel
+                        player_.rect.x += vel
                     else:
                         if slice_ == 1:
-                            ex_x += vel
+                            player_.rect.x += vel
                         elif (slice_-1) % level_size[1] != 0:
                             slice_ -= 1
-                            ex_x = 1820
+                            player_.rect.x = 1820
                             state = "Explore_update"
                         else:
-                            ex_x += vel
-                if ex_y > 980:
+                            player_.rect.x += vel
+                if player_.rect.y > 980:
                     if level_size == [1, 1]:
-                        ex_y -= vel
+                        player_.rect.y -= vel
                     else:
                         if slice_ < (level_size[1]**2)-level_size[1]:
                             slice_ += level_size[1]
-                            ex_y = 0
+                            player_.rect.y = 0
                             state = "Explore_update"
                         else:
-                            ex_y -= vel
-                elif ex_y < 0:
+                            player_.rect.y -= vel
+                elif player_.rect.y < 0:
                     if level_size == [1, 1]:
-                        ex_y += vel
+                        player_.rect.y += vel
                     else:
                         if slice_ > level_size[1]:
                             slice_ -= level_size[1]
-                            ex_y = 980
+                            player_.rect.y = 980
                             state = "Explore_update"
                         else:
-                            ex_y += vel
+                            player_.rect.y += vel
 
             # Collision
-            if True:
-                pass
+            player_.Collide(objects_group)
 
 
 run = True
