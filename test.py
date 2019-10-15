@@ -13,9 +13,10 @@ Options_selected = None
 Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
-object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png"]
+object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png"]
 player_width = 100
 player_hight = 100
+prev_failed_key = None
 
 x,y = 0,0
 
@@ -84,6 +85,7 @@ class Level():
         i = 0
         for line in f.readlines():
             if i == 2:
+                line = eval(line)
                 return line
             i += 1
 
@@ -107,13 +109,17 @@ class Player():
         self.image = img.load("img/player_normal.png").convert_alpha()
         self.size = self.image.get_rect().size
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        if True:
+            temp = lvl_1.get_startpos("lvl_1")
+            self.rect.x = temp[0]
+            self.rect.y = temp[1]
 
     def Collide(self, group1):
         global ex_x
         global ex_y
         global vel
-        if pygame.sprite.spritecollideany(self, group1) != None:
-            print("COLLISION!!!")
+        if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 player_.rect.move_ip(0, vel)
@@ -138,11 +144,14 @@ class Object__(pygame.sprite.Sprite):
         self.type = type
         if type == 0:
             Rock_1.__init__(self)
-        if type == 1:
+        elif type == 1:
             Rock_2.__init__(self)
-        
+        elif type == 2:
+            House_1.__init__(self)
+
     def setup(self):
         self.size = self.image.get_rect().size
+        self.mask = pygame.mask.from_surface(self.image)
 
 class Rock_1(Object__):
     def __init__(self):
@@ -153,6 +162,12 @@ class Rock_1(Object__):
 class Rock_2(Object__):
     def __init__(self):
         self.image = img.load(object_list[1])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class House_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[2])
         self.setup()
         self.rect = self.image.get_rect()
 
@@ -168,6 +183,9 @@ def re_draw():
     global level_size
     global ex_background
     global objects_group
+    global came_from
+    global level_size
+    global prev_failed_key
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -232,17 +250,19 @@ def re_draw():
             win.blit(ex_background, (0,0))
             win.blit(player, player_.rect)
             if Objects_empty == False:
+                b = 0
                 for i in Objects:
                     z = 0
                     for e in i:
                         if z == 0:
-                            nr = e+1
+                            nr = b+1
                         elif z == 1:
                             x = e
                         elif z == 2:
                             y = e
                             exec("win.blit(object_{}.image, ({}, {}))".format(nr, x, y))
                         z += 1
+                    b += 1
                 
                 
 
@@ -276,10 +296,35 @@ def re_draw():
                             y = e
                             exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y), globals())
                             exec("objects_group.add(object_{})".format(nr), globals())
+                            exec("object_{}.rect.x = {}".format(nr, x))
+                            exec("object_{}.rect.y = {}".format(nr, y))
                         z += 1
                     a += 1
                 
                 x_ += 1
+
+
+        # Checks if any corner of player is inside an object
+        for i in objects_group:
+            if i.rect.colliderect(player_):
+                print("Collided")
+                if came_from == "-x":
+                    slice_ -= 1
+                    prev_failed_key = "right"
+                    state = "Explore_update"
+                elif came_from == "x":
+                    slice_ += 1
+                    prev_failed_key = "left"
+                    state = "Explore_update"
+                elif came_from == "-y":
+                    slice_ -= level_size[0]
+                    prev_failed_key = "down"
+                    state = "Explore_update"
+                elif came_from == "y":
+                    slice_ += level_size[0]
+                    prev_failed_key = "up"
+                    state = "Explore_update"
+
             
 
         state = "Explore"
@@ -299,6 +344,8 @@ def updates():
     global level_size
     global level
     global leveln
+    global came_from
+    global prev_failed_key
     x, y = pygame.mouse.get_pos()
 
 
@@ -371,10 +418,11 @@ def updates():
 
 
     elif state == "Load_new":
+        came_from = None
         level = lvl_1
         leveln = "lvl_1"
         slice_ = level.get_startslice(leveln)
-        pos = eval(level.get_startpos(leveln))
+        pos = level.get_startpos(leveln)
         ex_x = pos[0]
         ex_y = pos[1]
         level_size = level.get_levelsize(leveln)
@@ -388,7 +436,6 @@ def updates():
             vel = 5
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
-                print(1)
                 player_.rect.move_ip(0, vel*-1)
                 ex_y -= vel
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -408,9 +455,11 @@ def updates():
                     if level_size == [1, 1]:
                         player_.rect.x -= vel
                     else:
-                        if slice_ % level_size[1] != 0:
+                        print("right =/=", prev_failed_key)
+                        if slice_ % level_size[1] != 0 and prev_failed_key != "right":
                             slice_ += 1
                             player_.rect.x = 0
+                            came_from = "-x"
                             state = "Explore_update"
                         else:
                             player_.rect.x -= vel
@@ -418,9 +467,11 @@ def updates():
                     if level_size == [1, 1]:
                         player_.rect.x += vel
                     else:
+                        print("left =/=", prev_failed_key)
                         if slice_ == 1:
                             player_.rect.x += vel
-                        elif (slice_-1) % level_size[1] != 0:
+                        elif (slice_-1) % level_size[1] != 0 and prev_failed_key != "left":
+                            came_from = "x"
                             slice_ -= 1
                             player_.rect.x = 1820
                             state = "Explore_update"
@@ -430,7 +481,9 @@ def updates():
                     if level_size == [1, 1]:
                         player_.rect.y -= vel
                     else:
-                        if slice_ < (level_size[1]**2)-level_size[1]:
+                        print("down =/=", prev_failed_key)
+                        if slice_ < (level_size[1]**2)-level_size[1] and prev_failed_key != "down":
+                            came_from = "-y"
                             slice_ += level_size[1]
                             player_.rect.y = 0
                             state = "Explore_update"
@@ -440,7 +493,9 @@ def updates():
                     if level_size == [1, 1]:
                         player_.rect.y += vel
                     else:
-                        if slice_ > level_size[1]:
+                        print("up =/=", prev_failed_key)
+                        if slice_ > level_size[1] and prev_failed_key != "up":
+                            came_from = "y"
                             slice_ -= level_size[1]
                             player_.rect.y = 980
                             state = "Explore_update"
