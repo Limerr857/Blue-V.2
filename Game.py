@@ -4,6 +4,8 @@ from pygame import image as img
 import os
 import time
 
+pygame.init()
+
 state = "Title"
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 pygame.display.set_caption("GE:START")
