@@ -1,8 +1,8 @@
 
 import pygame
 from pygame import image as img
-import os
 import time
+import math
 
 pygame.init()
 
@@ -15,10 +15,11 @@ Options_selected = None
 Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
-object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png"]
+object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png"]
 player_width = 100
 player_hight = 100
 prev_failed_key = None
+tophat_state = "Save"
 
 x,y = 0,0
 
@@ -46,8 +47,13 @@ Load_game_isdisabled = img.load("img/menu/Load_game_isdisabled.png").convert_alp
 player = img.load("img/player_normal.png").convert_alpha()
 
 
-objects_group = pygame.sprite.Group()
+roboto = pygame.font.Font("font/Roboto-Bold.ttf", 15)
+txt = roboto.render("", False, (0, 0, 0))
+txt_pos_x = (0, 0)
+txt_pos_y = (0, 0)
 
+objects_group = pygame.sprite.Group()
+NPC_group = pygame.sprite.Group()
 
 class Level():
     #                              should be number
@@ -105,9 +111,28 @@ class Level():
             elif "# slice {}".format(slice_) in line:
                 found = 1
 
+    
+    def get_text(self, name, slice_):
+        f = open("levels/{}.txt".format(name), "r")
+        found = 0
+        x = 0
+        for line in f.readlines():
+            if found == 3:
+                txt = line.split("/n")
+                txt = "".join(txt)
+                return eval(txt)
+            elif "# slice {}".format(slice_) in line:
+                found = 1
+            elif found > 0:
+                found += 1
+            x +=1
+
 lvl_1 = Level()
 
+
 class Player():
+    global tophat_state
+    global slice_
 
     def __init__(self):
         self.image = img.load("img/player_normal.png").convert_alpha()
@@ -123,6 +148,10 @@ class Player():
         global ex_x
         global ex_y
         global vel
+        global txt
+        global txt_pos_x
+        global txt_pos_y
+
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
@@ -138,8 +167,38 @@ class Player():
                 player_.rect.move_ip(vel*-1, 0)
                 #ex_x -= vel
 
-player_ = Player()
+        dist = 200
+        for obj in NPC_group.sprites():
+            center1 = obj.rect.center
+            center2 = player_.rect.center
 
+            diff_x = abs(center1[0] - center2[0])
+            diff_y = abs(center1[1] - center2[1])
+
+            # Pythagorean theorem
+            if diff_x**2 + diff_y**2 <= dist**2:
+                # TODO: Add a test that checks wich NPC has been close to and then displays the 
+                # corresponding text depending on what stage of the game you are in
+                if obj.type == 3:
+                    # Tophat
+                    if tophat_state == "Save":
+                        txt = lvl_1.get_text("lvl_1", slice_)
+                        txt = txt[0]
+                        txt = roboto.render(txt, True, (0, 0, 0))
+                        txt_pos_x = obj.rect.topleft[0]-63
+                        txt_pos_y = obj.rect.topleft[1]-100
+
+            else:
+                txt = roboto.render("", False, (0, 0, 0))
+                txt_pos_x = 0
+                txt_pos_y = 0
+
+                        
+
+
+
+                
+player_ = Player()
 
 
 class Object__(pygame.sprite.Sprite):
@@ -152,6 +211,8 @@ class Object__(pygame.sprite.Sprite):
             Rock_2.__init__(self)
         elif type == 2:
             House_1.__init__(self)
+        elif type == 3:
+            NPC_tophat_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -175,6 +236,22 @@ class House_1(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
+class NPC_tophat_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[3])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
+
+
+class TextRectException:
+    def __init__(self, message=None):
+            self.message = message
+
+    def __str__(self):
+        return self.message
+
+
 def re_draw():
     global state
     global player_state
@@ -190,6 +267,9 @@ def re_draw():
     global came_from
     global level_size
     global prev_failed_key
+    global txt
+    global txt_pos_x
+    global txt_pos_y
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -274,6 +354,7 @@ def re_draw():
                             exec("win.blit(object_{}.image, ({}, {}))".format(nr, x, y))
                         z += 1
                     b += 1
+            win.blit(txt, (txt_pos_x, txt_pos_y))
                 
 
     elif state == "Explore_update":
@@ -337,8 +418,6 @@ def re_draw():
             state = "Explore"
         elif state == "Explore_update_again":
             state = "Explore_update"
-
-
 
         
 def updates():
