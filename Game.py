@@ -55,8 +55,8 @@ shop_background.set_alpha(None)
 
 roboto = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 txt = roboto.render("", False, (0, 0, 0))
-txt_pos_x = (0, 0)
-txt_pos_y = (0, 0)
+txt_pos_x = 0
+txt_pos_y = 0
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
@@ -201,18 +201,17 @@ class Player():
                 if obj.type == 3:
                     # Tophat
                     if tophat_state == "Save":
+                        global txt
                         txt = lvl_1.get_text("lvl_1", slice_)
                         txt = txt[0]
-                        print(txt)
                         txt = roboto.render(txt, True, (0, 0, 0))
                         txt_pos_x = obj.rect.topleft[0]-63
                         txt_pos_y = obj.rect.topleft[1]-100
-                if obj.type == 4:
+                elif obj.type == 4:
                     # Blacksmith
                     if blacksmith_state == "New":
                         txt = lvl_1.get_text("lvl_1", slice_)
                         txt = txt[1]
-                        print(txt)
                         txt = roboto.render(txt, True, (0, 0, 0))
                         txt_pos_x = obj.rect.topleft[0]-63
                         txt_pos_y = obj.rect.topleft[1]-110
@@ -221,8 +220,7 @@ class Player():
                         if keys[pygame.K_r]:
                             # Player wants to enter the store.
                             state = "Shop_update"
-
-
+                break
             else:
                 txt = roboto.render("", False, (0, 0, 0))
                 txt_pos_x = 0
@@ -403,6 +401,7 @@ def re_draw():
         global Objects
         global Objects_empty
         global ex_background
+        global txt
         if player_state == "normal":
             win.blit(ex_background, (0,0))
             win.blit(player, player_.rect)
