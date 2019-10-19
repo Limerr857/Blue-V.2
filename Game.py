@@ -15,11 +15,15 @@ Options_selected = None
 Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
-object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png"]
+object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png"]
 player_width = 100
 player_hight = 100
 prev_failed_key = None
 tophat_state = "Save"
+blacksmith_state = "New"
+shop_state = "New"
+level_current = 1
+item_list = ["img/item/sword_1.png", "img/item/shield_1.png"]
 
 x,y = 0,0
 
@@ -46,6 +50,8 @@ Load_game_isdisabled = img.load("img/menu/Load_game_isdisabled.png").convert_alp
 
 player = img.load("img/player_normal.png").convert_alpha()
 
+shop_background = img.load("img/shop_1.png").convert()
+shop_background.set_alpha(None)
 
 roboto = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 txt = roboto.render("", False, (0, 0, 0))
@@ -54,6 +60,7 @@ txt_pos_y = (0, 0)
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
+items_group = pygame.sprite.Group()
 
 class Level():
     #                              should be number
@@ -126,6 +133,19 @@ class Level():
             elif found > 0:
                 found += 1
             x +=1
+    
+    def get_shopinv(self, name, slice_):
+        f = open("levels/{}.txt".format(name), "r")
+        found = 0
+        x = 0
+        for line in f.readlines():
+            if found == 4:
+                return eval(line)
+            elif "# slice {}".format(slice_) in line:
+                found = 1
+            elif found > 0:
+                found += 1
+            x +=1
 
 lvl_1 = Level()
 
@@ -151,6 +171,7 @@ class Player():
         global txt
         global txt_pos_x
         global txt_pos_y
+        global state
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
@@ -177,25 +198,35 @@ class Player():
 
             # Pythagorean theorem
             if diff_x**2 + diff_y**2 <= dist**2:
-                # TODO: Add a test that checks wich NPC has been close to and then displays the 
-                # corresponding text depending on what stage of the game you are in
                 if obj.type == 3:
                     # Tophat
                     if tophat_state == "Save":
                         txt = lvl_1.get_text("lvl_1", slice_)
                         txt = txt[0]
+                        print(txt)
                         txt = roboto.render(txt, True, (0, 0, 0))
                         txt_pos_x = obj.rect.topleft[0]-63
                         txt_pos_y = obj.rect.topleft[1]-100
+                if obj.type == 4:
+                    # Blacksmith
+                    if blacksmith_state == "New":
+                        txt = lvl_1.get_text("lvl_1", slice_)
+                        txt = txt[1]
+                        print(txt)
+                        txt = roboto.render(txt, True, (0, 0, 0))
+                        txt_pos_x = obj.rect.topleft[0]-63
+                        txt_pos_y = obj.rect.topleft[1]-110
+
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_r]:
+                            # Player wants to enter the store.
+                            state = "Shop_update"
+
 
             else:
                 txt = roboto.render("", False, (0, 0, 0))
                 txt_pos_x = 0
                 txt_pos_y = 0
-
-                        
-
-
 
                 
 player_ = Player()
@@ -213,6 +244,10 @@ class Object__(pygame.sprite.Sprite):
             House_1.__init__(self)
         elif type == 3:
             NPC_tophat_1.__init__(self)
+        elif type == 4:
+            NPC_blacksmith_1.__init__(self)
+        elif type == 5:
+            Forge_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -243,13 +278,42 @@ class NPC_tophat_1(Object__):
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
+class NPC_blacksmith_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[4])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
 
-class TextRectException:
-    def __init__(self, message=None):
-            self.message = message
+class Forge_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[5])
+        self.setup()
+        self.rect = self.image.get_rect()
 
-    def __str__(self):
-        return self.message
+
+class Item(pygame.sprite.Sprite):
+    
+    def __init__(self, type_, nr):
+        pygame.sprite.Sprite.__init__(self)
+        
+        if type_ == 1:
+            Sword_1.__init__(self)
+        
+        if type_ == 2:
+            Shield_1.__init__(self)
+
+class Sword_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[0])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+
+class Shield_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[1])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
 
 
 def re_draw():
@@ -270,6 +334,8 @@ def re_draw():
     global txt
     global txt_pos_x
     global txt_pos_y
+    global shop_state
+    global level_current
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -418,6 +484,42 @@ def re_draw():
             state = "Explore"
         elif state == "Explore_update_again":
             state = "Explore_update"
+
+
+    elif state == "Shop_update":
+        global inv
+        global Items_empty
+        if shop_state == "New":
+            if level_current == 1:
+                inv = lvl_1.get_shopinv("lvl_1", slice_)
+                Items_empty = False
+                if inv == "\n" or inv == None:
+                    Items_empty = True
+                if Items_empty == False:
+                    a = 1
+                    for i in inv:
+                        nr = a
+                        type_ = i
+                        exec("item_{} = Item({}, {})".format(nr, type_, nr), globals())
+                        exec("items_group.add(object_{})".format(nr), globals())
+                        exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
+                        exec("item_{}.rect.y = {}".format(nr, 114))
+                        a += 1
+                        
+        state = "Shop"
+    
+
+    elif state == "Shop":
+        if shop_state == "New":
+            if level_current == 1:
+                win.blit(shop_background, (0, 0))
+                if Items_empty == False:
+                    x_ = 1
+                    for i in inv:
+                        exec("win.blit(item_{}.image, item_{}.rect)".format(x_,x_), globals())
+                        x_+=1
+
+
 
         
 def updates():

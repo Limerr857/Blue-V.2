@@ -18,8 +18,9 @@
 
 # slice 1
 "img/Backdrops/Level_1_background_1.png"
-[[0, 500, 500], [2, 1000, 300], [3, 1070, 600]]
-["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!"]
+[[0, 500, 500], [2, 1000, 300], [3, 1070, 600], [5, 30, 50], [4, 100, 400]]
+["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!", "I'm the blacksmith, here you can buy upgrades for your weapons! [PRESS R]"]
+[1, 2]
 
 # slice 2
 "img/Backdrops/Level_1_background_2.png"
