@@ -25,6 +25,11 @@ shop_state = "New"
 level_current = 1
 item_list = ["img/item/sword_1.png", "img/item/shield_1.png"]
 
+shop_i_cost = "n/a"
+shop_i_health = "n/a"
+shop_i_attack = "n/a"
+shop_i_special = "n/a"
+
 x,y = 0,0
 
 
@@ -53,8 +58,12 @@ player = img.load("img/player_normal.png").convert_alpha()
 shop_background = img.load("img/shop_1.png").convert()
 shop_background.set_alpha(None)
 
-roboto = pygame.font.Font("font/Roboto-Bold.ttf", 15)
-txt = roboto.render("", False, (0, 0, 0))
+roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
+roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
+roboto_60 = pygame.font.Font("font/Roboto-Bold.ttf", 60)
+roboto_120 = pygame.font.Font("font/Roboto-Bold.ttf", 120)
+
+txt = roboto_15.render("", False, (0, 0, 0))
 txt_pos_x = 0
 txt_pos_y = 0
 
@@ -127,7 +136,11 @@ class Level():
             if found == 3:
                 txt = line.split("/n")
                 txt = "".join(txt)
-                return eval(txt)
+                try:
+                    return eval(txt)
+                except:
+                    # Prevents a bug from happening, if you get error ""string index out of range" then lenghten this list.
+                    return ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
             elif "# slice {}".format(slice_) in line:
                 found = 1
             elif found > 0:
@@ -159,6 +172,7 @@ class Player():
         self.size = self.image.get_rect().size
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
+        self.inventory = []
         if True:
             temp = lvl_1.get_startpos("lvl_1")
             self.rect.x = temp[0]
@@ -204,7 +218,7 @@ class Player():
                         global txt
                         txt = lvl_1.get_text("lvl_1", slice_)
                         txt = txt[0]
-                        txt = roboto.render(txt, True, (0, 0, 0))
+                        txt = roboto_15.render(txt, True, (0, 0, 0))
                         txt_pos_x = obj.rect.topleft[0]-63
                         txt_pos_y = obj.rect.topleft[1]-100
                 elif obj.type == 4:
@@ -212,7 +226,7 @@ class Player():
                     if blacksmith_state == "New":
                         txt = lvl_1.get_text("lvl_1", slice_)
                         txt = txt[1]
-                        txt = roboto.render(txt, True, (0, 0, 0))
+                        txt = roboto_15.render(txt, True, (0, 0, 0))
                         txt_pos_x = obj.rect.topleft[0]-63
                         txt_pos_y = obj.rect.topleft[1]-110
 
@@ -222,7 +236,7 @@ class Player():
                             state = "Shop_update"
                 break
             else:
-                txt = roboto.render("", False, (0, 0, 0))
+                txt = roboto_15.render("", False, (0, 0, 0))
                 txt_pos_x = 0
                 txt_pos_y = 0
 
@@ -294,11 +308,12 @@ class Item(pygame.sprite.Sprite):
     
     def __init__(self, type_, nr):
         pygame.sprite.Sprite.__init__(self)
+        self.clicked = False
+        self.type_ = type_
         
         if type_ == 1:
             Sword_1.__init__(self)
-        
-        if type_ == 2:
+        elif type_ == 2:
             Shield_1.__init__(self)
 
 class Sword_1(Item):
@@ -306,12 +321,14 @@ class Sword_1(Item):
         self.image = img.load(item_list[0])
         self.rect = self.image.get_rect()
         self.size = self.rect.size
+        self.name = "sword_1"
 
 class Shield_1(Item):
     def __init__(self):
         self.image = img.load(item_list[1])
         self.rect = self.image.get_rect()
         self.size = self.rect.size
+        self.name = "shield_1"
 
 
 def re_draw():
@@ -334,6 +351,10 @@ def re_draw():
     global txt_pos_y
     global shop_state
     global level_current
+    global shop_i_attack
+    global shop_i_health
+    global shop_i_cost
+    global shop_i_special
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -426,6 +447,7 @@ def re_draw():
         objects_group = pygame.sprite.Group()
         Objects = level.get_objects(leveln, slice_)
         Objects_empty = False
+        items_group.empty()
         if Objects == "\n" or Objects == None:
             Objects_empty = True
         if Objects_empty == False:
@@ -500,7 +522,7 @@ def re_draw():
                         nr = a
                         type_ = i
                         exec("item_{} = Item({}, {})".format(nr, type_, nr), globals())
-                        exec("items_group.add(object_{})".format(nr), globals())
+                        exec("items_group.add(item_{})".format(nr), globals())
                         exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
                         exec("item_{}.rect.y = {}".format(nr, 114))
                         a += 1
@@ -517,6 +539,15 @@ def re_draw():
                     for i in inv:
                         exec("win.blit(item_{}.image, item_{}.rect)".format(x_,x_), globals())
                         x_+=1
+            txt1 = roboto_30.render(shop_i_attack, True, (0, 0, 0))
+            txt2 = roboto_30.render(shop_i_health, True, (0, 0, 0))
+            txt3 = roboto_30.render(shop_i_cost, True, (0, 0, 0))
+            txt4 = roboto_30.render(shop_i_special, True, (0, 0, 0))
+            win.blit(txt1, (1570, 246))
+            win.blit(txt2, (1570, 378))
+            win.blit(txt3, (1570, 114))
+            win.blit(txt4, (1570, 510))
+
 
 
 
@@ -536,8 +567,13 @@ def updates():
     global came_from
     global prev_failed_key
     global run
+    global inv
+    global shop_i_attack
+    global shop_i_health
+    global shop_i_cost
+    global shop_i_special
+    global items_group
     x, y = pygame.mouse.get_pos()
-
 
     if state == "Title":
 
@@ -696,6 +732,47 @@ def updates():
 
             # Collision
             player_.Collide(objects_group)
+
+
+    elif state == "Shop":
+        mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+
+        # Mouse over exit
+        if x >= 1022 and y <= 58:
+            if mouse_1:
+                state = "Explore_update"
+        
+        for item in items_group:
+            # Mouse over 
+            if x > item.rect.x and x < item.rect.x + 95 and y > item.rect.y and y < item.rect.y + 95:
+                if mouse_1:
+                    item.clicked = True
+                else:
+                    item.clicked = False
+            else:
+                item.clicked = False
+        
+        x_ = 1
+        for item in items_group:
+            if item.clicked == True:
+                exec("item_{}.image = img.load('img/item/{}_selected.png')".format(x_, item.name), globals())
+                if item.type_ == 1:
+                    # sword_1
+                    shop_i_attack = "3"
+                    shop_i_health = "n/a"
+                    shop_i_cost = "10"
+                    shop_i_special = "None"
+                if item.type_ == 2:
+                    # shield_1
+                    shop_i_attack = "n/a"
+                    shop_i_health = "50"
+                    shop_i_cost = "5"
+                    shop_i_special = "None"
+                    
+            else:
+                exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
+            x_ += 1
+
 
 
 run = True
