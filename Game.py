@@ -29,6 +29,7 @@ shop_i_cost = "n/a"
 shop_i_health = "n/a"
 shop_i_attack = "n/a"
 shop_i_special = "n/a"
+shop_i_selected = "None"
 
 x,y = 0,0
 
@@ -43,9 +44,10 @@ options_isselected = img.load("img/menu/options_isselected.png").convert_alpha()
 play_isselected = img.load("img/menu/play_isselected.png").convert_alpha()
 exit_isselected = img.load("img/menu/exit_isselected.png").convert_alpha()
 
-coming_soon = img.load("img/menu/coming_soon.png").convert_alpha()
 go_back = img.load("img/menu/go_back.png").convert_alpha()
 go_back_isselected = img.load("img/menu/go_back_isselected.png").convert_alpha()
+toggle_music = img.load("img/menu/toggle_music.png").convert_alpha()
+toggle_music_isselected = img.load("img/menu/toggle_music_isselected.png").convert_alpha()
 
 New_game = img.load("img/menu/New_game.png").convert_alpha()
 New_game_isselected = img.load("img/menu/New_game_isselected.png").convert_alpha()
@@ -66,6 +68,10 @@ roboto_120 = pygame.font.Font("font/Roboto-Bold.ttf", 120)
 txt = roboto_15.render("", False, (0, 0, 0))
 txt_pos_x = 0
 txt_pos_y = 0
+
+music_track_2 = pygame.mixer.music.load("sound/music/menu.mp3")
+music_on = True
+music_played = False
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
@@ -173,6 +179,8 @@ class Player():
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
+        # Temporary
+        self.money = "999999999"
         if True:
             temp = lvl_1.get_startpos("lvl_1")
             self.rect.x = temp[0]
@@ -379,11 +387,15 @@ def re_draw():
     
     elif state == "Options":
         win.blit(background, (0,0))
-        win.blit(coming_soon, (0,0))
         if Options_selected == None:
             win.blit(go_back, (0,880))
+            win.blit(toggle_music, (0,600))
         elif Options_selected == "go_back":
             win.blit(go_back_isselected, (0,880))
+            win.blit(toggle_music, (0,600))
+        elif Options_selected == "toggle_music":
+            win.blit(go_back, (0,880))
+            win.blit(toggle_music_isselected, (0,600))
 
     
     elif state == "Play":
@@ -539,14 +551,16 @@ def re_draw():
                     for i in inv:
                         exec("win.blit(item_{}.image, item_{}.rect)".format(x_,x_), globals())
                         x_+=1
-            txt1 = roboto_30.render(shop_i_attack, True, (0, 0, 0))
-            txt2 = roboto_30.render(shop_i_health, True, (0, 0, 0))
-            txt3 = roboto_30.render(shop_i_cost, True, (0, 0, 0))
-            txt4 = roboto_30.render(shop_i_special, True, (0, 0, 0))
+            txt1 = roboto_30.render(shop_i_attack, True, (255, 255, 255))
+            txt2 = roboto_30.render(shop_i_health, True, (255, 255, 255))
+            txt3 = roboto_30.render(shop_i_cost, True, (255, 255, 255))
+            txt4 = roboto_30.render(shop_i_special, True, (255, 255, 255))
+            txt5 = roboto_30.render(player_.money, True, (255, 255, 255))
             win.blit(txt1, (1570, 246))
             win.blit(txt2, (1570, 378))
             win.blit(txt3, (1570, 114))
             win.blit(txt4, (1570, 510))
+            win.blit(txt5, (1570, 779))
 
 
 
@@ -573,9 +587,21 @@ def updates():
     global shop_i_cost
     global shop_i_special
     global items_group
+    global music_track_1
+    global music_on
+    global music_played
     x, y = pygame.mouse.get_pos()
 
     if state == "Title":
+        if music_played == False:
+            if music_on:
+                pygame.mixer.music.play(-1)
+                music_played = True
+        else:
+            if music_on == False:
+                pygame.mixer.music.stop()
+                music_played = False
+
 
         # Check which text is hovered over
         if x > 500 and x < 1200:
@@ -596,10 +622,11 @@ def updates():
             if Title_selected == "play":
                 state = "Play"
                 Title_selected = None
-                time.sleep(0.1)
+                time.sleep(0.2)
             elif Title_selected == "options":
                 state = "Options"
                 Title_selected = None
+                time.sleep(0.2)
             elif Title_selected == "exit":
                 run = False
                 
@@ -607,7 +634,9 @@ def updates():
     elif state == "Options":
         # Check which text is hovered over
         if x > 500 and x < 1200:
-            if y > 880:
+            if y > 600 and y < 800:
+                Options_selected = "toggle_music"
+            elif y > 880:
                 Options_selected = "go_back"
             else:
                 Options_selected = None
@@ -621,6 +650,15 @@ def updates():
                 state = "Title"
                 Options_selected = None
                 time.sleep(0.1)
+            elif Options_selected == "toggle_music":
+                if music_on == True:
+                    music_on = False
+                    pygame.mixer.music.stop()
+                    time.sleep(0.1)
+                else:
+                    music_on = True
+                    pygame.mixer.music.play(-1)
+                    time.sleep(0.1)
 
 
     elif state == "Play":
@@ -650,6 +688,8 @@ def updates():
 
 
     elif state == "Load_new":
+        global music_track_1
+        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
         came_from = None
         level = lvl_1
         leveln = "lvl_1"
@@ -658,6 +698,8 @@ def updates():
         ex_x = pos[0]
         ex_y = pos[1]
         level_size = level.get_levelsize(leveln)
+        if music_on:
+            pygame.mixer.music.play(-1)
 
         state = "Explore_update"
 
