@@ -17,33 +17,41 @@
 
 
 # slice 1
-"img/Backdrops/Level_1_background_1.png"
+"img/Backdrops/Level_1_1.png"
 [[0, 500, 500], [2, 1000, 300], [3, 1070, 600], [5, 30, 50], [4, 100, 400]]
 ["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!", "I'm the blacksmith, here you can buy upgrades for your weapons! [PRESS R]"]
 [1, 2]
 
 # slice 2
-"img/Backdrops/Level_1_background_2.png"
-[[0, 300, 500], [1, 190, 435]]
+"img/Backdrops/Level_1_2.png"
+[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719]]
 
 # slice 3
-"img/Backdrops/Level_1_background_3.png"
+"img/Backdrops/Level_1_3.png"
 
 # slice 4
-"img/Backdrops/Level_1_background_4.png"
+"img/Backdrops/Level_1_4.png"
 
 # slice 5
-"img/Backdrops/Level_1_background_5.png"
+"img/Backdrops/Level_1_5.png"
+[[8, 1709, 0]]
 
 # slice 6
-"img/Backdrops/Level_1_background_6.png"
+"img/Backdrops/Level_1_6.png"
 
 # slice 7
-"img/Backdrops/Level_1_background_7.png"
+"img/Backdrops/Level_1_7.png"
 
 # slice 8
-"img/Backdrops/Level_1_background_8.png"
+"img/Backdrops/Level_1_8.png"
+[[9, 1709, 0]]
 
 # slice 9
-"img/Backdrops/Level_1_background_9.png"
+"img/Backdrops/Level_1_9.png"
+
+
+
+
+
+
 

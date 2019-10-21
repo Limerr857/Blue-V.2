@@ -15,7 +15,9 @@ Options_selected = None
 Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
-object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png"]
+object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", 
+               "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
+               "img/obj/wall_3.png", "img/obj/wall_4.png"]
 player_width = 100
 player_hight = 100
 prev_failed_key = None
@@ -30,6 +32,7 @@ shop_i_health = "n/a"
 shop_i_attack = "n/a"
 shop_i_special = "n/a"
 shop_i_selected = "None"
+shop_i_bought = []
 
 x,y = 0,0
 
@@ -153,6 +156,7 @@ class Level():
                 found += 1
             x +=1
     
+
     def get_shopinv(self, name, slice_):
         f = open("levels/{}.txt".format(name), "r")
         found = 0
@@ -180,7 +184,10 @@ class Player():
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
         # Temporary
-        self.money = "999999999"
+        self.money = "9999"
+        # Not temporary
+        self.attack = 0
+        self.hp = 100
         if True:
             temp = lvl_1.get_startpos("lvl_1")
             self.rect.x = temp[0]
@@ -268,6 +275,14 @@ class Object__(pygame.sprite.Sprite):
             NPC_blacksmith_1.__init__(self)
         elif type == 5:
             Forge_1.__init__(self)
+        elif type == 6:
+            Wall_1.__init__(self)
+        elif type == 7:
+            Wall_2.__init__(self)
+        elif type == 8:
+            Wall_3.__init__(self)
+        elif type == 9:
+            Wall_4.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -308,6 +323,30 @@ class NPC_blacksmith_1(Object__):
 class Forge_1(Object__):
     def __init__(self):
         self.image = img.load(object_list[5])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Wall_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[6])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Wall_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[7])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Wall_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[8])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Wall_4(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[9])
         self.setup()
         self.rect = self.image.get_rect()
 
@@ -363,6 +402,7 @@ def re_draw():
     global shop_i_health
     global shop_i_cost
     global shop_i_special
+    global shop_i_bought
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -549,7 +589,9 @@ def re_draw():
                 if Items_empty == False:
                     x_ = 1
                     for i in inv:
-                        exec("win.blit(item_{}.image, item_{}.rect)".format(x_,x_), globals())
+                        ex = """if item_{}.name not in shop_i_bought:
+                                    exec("win.blit(item_{}.image, item_{}.rect)", globals())""".format(x_, x_, x_)
+                        exec(ex, globals())
                         x_+=1
             txt1 = roboto_30.render(shop_i_attack, True, (255, 255, 255))
             txt2 = roboto_30.render(shop_i_health, True, (255, 255, 255))
@@ -586,10 +628,12 @@ def updates():
     global shop_i_health
     global shop_i_cost
     global shop_i_special
+    global shop_i_selected
     global items_group
     global music_track_1
     global music_on
     global music_played
+    global shop_i_bought
     x, y = pygame.mouse.get_pos()
 
     if state == "Title":
@@ -707,7 +751,7 @@ def updates():
     elif state == "Explore":
         if player_state == "normal":
             global vel
-            vel = 5
+            vel = 10
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 player_.rect.move_ip(0, vel*-1)
@@ -753,7 +797,7 @@ def updates():
                     if level_size == [1, 1]:
                         player_.rect.y -= vel
                     else:
-                        if slice_ < (level_size[1]**2)-level_size[1] and prev_failed_key != "down":
+                        if slice_ <= (level_size[1]**2)-level_size[1] and prev_failed_key != "down":
                             came_from = "-y"
                             slice_ += level_size[1]
                             player_.rect.y = 0
@@ -784,6 +828,30 @@ def updates():
             if mouse_1:
                 state = "Explore_update"
         
+        # Mouse over BUY
+        if x >= 1582 and x < 1895 and y >= 950 and y < 1065:
+            if mouse_1 and shop_i_cost != "n/a":
+                if int(player_.money) - int(shop_i_cost) >= 0:
+                    if shop_i_selected != "None":
+                        shop_i_bought.append(shop_i_selected)
+                        try:
+                            player_.hp += int(shop_i_health)
+                        except:
+                            pass
+                        try:
+                            player_.attack += int(shop_i_attack)
+                        except:
+                            pass
+                        shop_i_health = "n/a"
+                        shop_i_attack = "n/a"
+                        shop_i_special = "n/a"
+                        shop_i_selected = "None"
+                        player_.money = int(player_.money)
+                        player_.money -= int(shop_i_cost)
+                        player_.money = str(player_.money)
+                        shop_i_cost = "n/a"
+
+
         for item in items_group:
             # Mouse over 
             if x > item.rect.x and x < item.rect.x + 95 and y > item.rect.y and y < item.rect.y + 95:
@@ -797,20 +865,24 @@ def updates():
         x_ = 1
         for item in items_group:
             if item.clicked == True:
-                exec("item_{}.image = img.load('img/item/{}_selected.png')".format(x_, item.name), globals())
-                if item.type_ == 1:
-                    # sword_1
-                    shop_i_attack = "3"
-                    shop_i_health = "n/a"
-                    shop_i_cost = "10"
-                    shop_i_special = "None"
-                if item.type_ == 2:
-                    # shield_1
-                    shop_i_attack = "n/a"
-                    shop_i_health = "50"
-                    shop_i_cost = "5"
-                    shop_i_special = "None"
-                    
+                if item.name not in shop_i_bought:
+                    exec("item_{}.image = img.load('img/item/{}_selected.png')".format(x_, item.name), globals())
+                    if item.type_ == 1:
+                        # sword_1
+                        shop_i_attack = "3"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "10"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_1"
+                    if item.type_ == 2:
+                        # shield_1
+                        shop_i_attack = "n/a"
+                        shop_i_health = "50"
+                        shop_i_cost = "5"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_1"
+                else:
+                    exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:
                 exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             x_ += 1
