@@ -13,7 +13,10 @@
 
 # slice n
 # path to background
-# objects [type, x, y]
+# objects/enemies/npc's [type, x, y]
+# optional text
+# items in shop
+
 
 
 # slice 1
@@ -24,7 +27,7 @@
 
 # slice 2
 "img/Backdrops/Level_1_2.png"
-[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719]]
+[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719], [10, 900, 700]]
 
 # slice 3
 "img/Backdrops/Level_1_3.png"

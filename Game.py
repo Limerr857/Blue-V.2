@@ -17,15 +17,17 @@ Load_game_disabled = True
 player_state = "normal"
 object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", 
                "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
-               "img/obj/wall_3.png", "img/obj/wall_4.png"]
+               "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png"]
 player_width = 100
-player_hight = 100
+player_height = 100
 prev_failed_key = None
 tophat_state = "Save"
 blacksmith_state = "New"
 shop_state = "New"
 level_current = 1
 item_list = ["img/item/sword_1.png", "img/item/shield_1.png"]
+battle_list = ["img/battle/enemy_battle.png"]
+battle_state = "normal"
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -63,6 +65,9 @@ player = img.load("img/player_normal.png").convert_alpha()
 shop_background = img.load("img/shop_1.png").convert()
 shop_background.set_alpha(None)
 
+battle_background_1 = img.load("img/battle_1.png").convert()
+battle_background_1.set_alpha(None)
+
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
 roboto_60 = pygame.font.Font("font/Roboto-Bold.ttf", 60)
@@ -79,6 +84,7 @@ music_played = False
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
 items_group = pygame.sprite.Group()
+enemies_group = pygame.sprite.Group()
 
 class Level():
     #                              should be number
@@ -170,6 +176,20 @@ class Level():
                 found += 1
             x +=1
 
+
+    def get_enemies(self, name, slice_):
+        f = open("levels/{}.txt".format(name), "r")
+        found = 0
+        x = 0
+        for line in f.readlines():
+            if found == 5:
+                return eval(line)
+            elif "# slice {}".format(slice_) in line:
+                found = 1
+            elif found > 0:
+                found += 1
+            x +=1
+            
 lvl_1 = Level()
 
 
@@ -179,6 +199,7 @@ class Player():
 
     def __init__(self):
         self.image = img.load("img/player_normal.png").convert_alpha()
+        self.image_battle = img.load("img/battle/player_battle.png").convert_alpha()
         self.size = self.image.get_rect().size
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -188,6 +209,7 @@ class Player():
         # Not temporary
         self.attack = 0
         self.hp = 100
+        self.maxhp = 100
         if True:
             temp = lvl_1.get_startpos("lvl_1")
             self.rect.x = temp[0]
@@ -201,21 +223,19 @@ class Player():
         global txt_pos_x
         global txt_pos_y
         global state
+        global slice_
+        global battle_enemy
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 player_.rect.move_ip(0, vel)
-                #ex_y += vel
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
                 player_.rect.move_ip(vel, 0)
-                #ex_x += vel
             if keys[pygame.K_DOWN] or keys[pygame.K_s]:
                 player_.rect.move_ip(0, vel*-1)
-                #ex_y -= vel
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                 player_.rect.move_ip(vel*-1, 0)
-                #ex_x -= vel
 
         dist = 200
         for obj in NPC_group.sprites():
@@ -255,6 +275,22 @@ class Player():
                 txt_pos_x = 0
                 txt_pos_y = 0
 
+        
+        dist = 150
+        for obj in enemies_group.sprites():
+            center1 = obj.rect.center
+            center2 = player_.rect.center
+
+            diff_x = abs(center1[0] - center2[0])
+            diff_y = abs(center1[1] - center2[1])
+
+            # Pythagorean theorem
+            if diff_x**2 + diff_y**2 <= dist**2:
+                # Check so that the enemy is in the same frame
+                if obj.slice_ == slice_:
+                    battle_enemy = obj.name
+                    state = "Battle_update"
+
                 
 player_ = Player()
 
@@ -283,6 +319,8 @@ class Object__(pygame.sprite.Sprite):
             Wall_3.__init__(self)
         elif type == 9:
             Wall_4.__init__(self)
+        elif type == 10:
+            Enemy_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -350,6 +388,14 @@ class Wall_4(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
+class Enemy_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[10])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Enemy_1"
+        enemies_group.add(self)
+
 
 class Item(pygame.sprite.Sprite):
     
@@ -378,6 +424,7 @@ class Shield_1(Item):
         self.name = "shield_1"
 
 
+
 def re_draw():
     global state
     global player_state
@@ -403,6 +450,10 @@ def re_draw():
     global shop_i_cost
     global shop_i_special
     global shop_i_bought
+    global battle_state
+    global music_played
+    global battle_enemy
+    global battle_enemy_img
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -526,6 +577,7 @@ def re_draw():
                             exec("objects_group.add(object_{})".format(nr), globals())
                             exec("object_{}.rect.x = {}".format(nr, x))
                             exec("object_{}.rect.y = {}".format(nr, y))
+                            exec("object_{}.slice_ = {}".format(nr, slice_))
                         z += 1
                     a += 1
                 
@@ -603,6 +655,28 @@ def re_draw():
             win.blit(txt3, (1570, 114))
             win.blit(txt4, (1570, 510))
             win.blit(txt5, (1570, 779))
+
+
+    elif state == "Battle":
+        if battle_state == "normal":
+            if level_current == 1:
+                win.blit(battle_background_1, [0, 0])
+            if music_played == True:
+                pygame.mixer.music.stop()
+                music_played = False
+            
+            win.blit(player_.image_battle, player_.rect)
+            win.blit(battle_enemy_img, [1800, 650])
+    
+
+    elif state == "Battle_update":
+        player_.rect.x = 50
+        player_.rect.y = 650
+
+        if battle_enemy == "Enemy_1":
+            battle_enemy_img = img.load(battle_list[0]).convert_alpha()
+
+        state = "Battle"
 
 
 
@@ -751,7 +825,7 @@ def updates():
     elif state == "Explore":
         if player_state == "normal":
             global vel
-            vel = 10
+            vel = 15
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] or keys[pygame.K_w]:
                 player_.rect.move_ip(0, vel*-1)
