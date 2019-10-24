@@ -3,6 +3,7 @@ import pygame
 from pygame import image as img
 import time
 import math
+import random
 
 pygame.init()
 
@@ -28,6 +29,12 @@ level_current = 1
 item_list = ["img/item/sword_1.png", "img/item/shield_1.png"]
 battle_list = ["img/battle/enemy_battle.png"]
 battle_state = "normal"
+battle_animation = "none"
+battle_anim_time = 0
+battle_menu = 1
+battle_queue = []
+battle_time = 0
+battle_enemy_hp = 100
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -67,6 +74,11 @@ shop_background.set_alpha(None)
 
 battle_background_1 = img.load("img/battle_1.png").convert()
 battle_background_1.set_alpha(None)
+battle_menu_1 = img.load("img/battle/battle_menu_1.png").convert_alpha()
+battle_menu_2 = img.load("img/battle/battle_menu_2.png").convert_alpha()
+battle_menu_3 = img.load("img/battle/battle_menu_3.png").convert_alpha()
+battle_bar_hp = img.load("img/battle/bar_hp.png").convert()
+battle_bar_attacktime = img.load("img/battle/bar_attacktime.png").convert()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -389,6 +401,7 @@ class Wall_4(Object__):
         self.rect = self.image.get_rect()
 
 class Enemy_1(Object__):
+    speed = 300 # 5 seconds
     def __init__(self):
         self.image = img.load(object_list[10])
         self.setup()
@@ -454,6 +467,13 @@ def re_draw():
     global music_played
     global battle_enemy
     global battle_enemy_img
+    global battle_enemy_x
+    global battle_enemy_y
+    global battle_animation
+    global battle_anim_time
+    global battle_time
+    global battle_menu
+    global battle_enemy_hp
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -658,6 +678,7 @@ def re_draw():
 
 
     elif state == "Battle":
+        b_x, b_y = pygame.mouse.get_pos()
         if battle_state == "normal":
             if level_current == 1:
                 win.blit(battle_background_1, [0, 0])
@@ -666,7 +687,136 @@ def re_draw():
                 music_played = False
             
             win.blit(player_.image_battle, player_.rect)
-            win.blit(battle_enemy_img, [1800, 650])
+            win.blit(battle_enemy_img, (battle_enemy_x, battle_enemy_y))
+            win.blit(battle_bar_attacktime, (581, 90))
+            win.blit(battle_bar_hp, (581, 17))
+            win.blit(battle_bar_hp, (996, 17))
+
+            if battle_menu == 1:
+                win.blit(battle_menu_1, (0, 0))
+                win.blit(battle_menu_2, (1344, 0))
+                # TODO LATER: Make stuff "select" when mouse is over like the menu
+                
+                mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+                if mouse_1:
+                    if b_x >= 13 and b_x <= 563:
+                        # Mouse is probably over one of the buttons on the right.
+                        if b_y >= 17 and b_y <= 117:
+                            # Clicked on the Slash button
+                            battle_queue.append("p_slash")
+                        elif b_y >= 126 and b_y <= 226:
+                            # Clicked on the Shot button
+                            battle_queue.append("p_shot")
+                        elif b_y >= 235 and b_y <= 335:
+                            # Clicked on the Fire button
+                            battle_queue.append("p_fire")
+                        elif b_y >= 334 and b_y <= 444:
+                            # Clicked on the ice button
+                            battle_queue.append("p_ice")
+                    elif b_x >= 1344 and b_x <= 1920: 
+                        # Mouse is probably over one of the buttons on the left.
+                        if b_y >= 17 and b_y <= 117:
+                            # Clicked on the Heal button
+                            battle_queue.append("p_heal")
+                        elif b_y >= 126 and b_y <= 226:
+                            # Clicked on the Brave button
+                            battle_queue.append("p_brave")
+                        elif b_y >= 235 and b_y <= 335:
+                            # Clicked on the PLACEHOLDER button
+                            pass
+                        elif b_y >= 334 and b_y <= 444:
+                            # Clicked on the Retreat button
+                            battle_menu = 2
+
+            elif battle_menu == 2:
+                # Retreat menu is up
+                win.blit(battle_menu_1, (0, 0))
+                win.blit(battle_menu_3, (1344, 0))
+                mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+                if mouse_1:
+                    if b_x >= 13 and b_x <= 563:
+                        # Mouse is probably over one of the buttons on the right.
+                        if b_y >= 17 and b_y <= 117:
+                            # Clicked on the Slash button
+                            battle_queue.append("p_slash")
+                        elif b_y >= 126 and b_y <= 226:
+                            # Clicked on the Shot button
+                            battle_queue.append("p_shot")
+                        elif b_y >= 235 and b_y <= 335:
+                            # Clicked on the Fire button
+                            battle_queue.append("p_fire")
+                        elif b_y >= 334 and b_y <= 444:
+                            # Clicked on the ice button
+                            battle_queue.append("p_ice")
+                    elif b_x >= 1344 and b_x <= 1920: 
+                        # Mouse is probably over one of the buttons on the left.
+                        if b_y >= 126 and b_y <= 226:
+                            # Clicked on the Yes, retreat button
+                            pass
+                        elif b_y >= 235 and b_y <= 335:
+                            # Clicked on the No button
+                            battle_menu = 1
+
+            # Main animation queue
+            battle_speed = eval("{}.speed".format(battle_enemy))
+            if battle_time > battle_speed:
+                battle_time = 0
+                if battle_enemy == "Enemy_1":
+                    battle_queue.append("e_slash")
+            elif battle_time <= battle_speed:
+                battle_time += 1
+            else:
+                print("Error")
+            if battle_queue != []:
+                battle_state = "anim"
+                battle_animation = battle_queue[0]
+                battle_queue.pop(0)
+
+            # Attack time bar
+            pygame.draw.rect(win, (200, 200, 200), (586, 95, round(battle_time/battle_speed*748-3), 10))
+
+            # Player and Enemy HP (respectively)
+            pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
+            pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+
+
+        if battle_state == "anim":
+
+            if battle_animation == "e_slash":
+                if battle_anim_time < 100:
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                    battle_enemy_x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time > 200:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+            elif battle_animation == "p_slash":
+                if battle_anim_time < 100:
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                    player_.rect.x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time > 200:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+
+            else:
+                print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
+
+
+            
+            if level_current == 1:
+                win.blit(battle_background_1, [0, 0])
+            if music_played == True:
+                pygame.mixer.music.stop()
+                music_played = False
+            win.blit(player_.image_battle, player_.rect)
+            win.blit(battle_enemy_img, (battle_enemy_x, battle_enemy_y))
     
 
     elif state == "Battle_update":
@@ -675,6 +825,9 @@ def re_draw():
 
         if battle_enemy == "Enemy_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
+            battle_enemy_x = 1800
+            battle_enemy_y = 650
+            battle_enemy_hp = 100
 
         state = "Battle"
 
