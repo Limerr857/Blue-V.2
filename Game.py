@@ -7,6 +7,12 @@ import random
 
 pygame.init()
 
+# Almost total re-write of code neccesary to make enemies disappear.
+# Bosses should be the only enemies that are visible, all other enemies are randomly generated based on slice, level etc.
+# Don't forget to put this new test verision into another branch. 
+# Also, don't forget that you will have re-written this eventually.
+
+
 state = "Title"
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 pygame.display.set_caption("GE:START")
@@ -79,6 +85,8 @@ battle_menu_2 = img.load("img/battle/battle_menu_2.png").convert_alpha()
 battle_menu_3 = img.load("img/battle/battle_menu_3.png").convert_alpha()
 battle_bar_hp = img.load("img/battle/bar_hp.png").convert()
 battle_bar_attacktime = img.load("img/battle/bar_attacktime.png").convert()
+battle_won = img.load("img/battle/won_1.png").convert()
+battle_lost = img.load("img/battle/lost_1.png").convert()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -97,6 +105,8 @@ objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
 items_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
+enemies_dead_group = pygame.sprite.Group()
+
 
 class Level():
     #                              should be number
@@ -217,9 +227,9 @@ class Player():
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
         # Temporary
-        self.money = "9999"
+        self.money = 9999
+        self.attack = 50
         # Not temporary
-        self.attack = 0
         self.hp = 100
         self.maxhp = 100
         if True:
@@ -303,7 +313,6 @@ class Player():
                     battle_enemy = obj.name
                     state = "Battle_update"
 
-                
 player_ = Player()
 
 
@@ -437,7 +446,6 @@ class Shield_1(Item):
         self.name = "shield_1"
 
 
-
 def re_draw():
     global state
     global player_state
@@ -474,6 +482,10 @@ def re_draw():
     global battle_time
     global battle_menu
     global battle_enemy_hp
+    global battle_enemy_maxhp
+    global battle_enemy_attack
+    global battle_enemy_gold
+    global battle_gold_random
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -669,7 +681,7 @@ def re_draw():
             txt2 = roboto_30.render(shop_i_health, True, (255, 255, 255))
             txt3 = roboto_30.render(shop_i_cost, True, (255, 255, 255))
             txt4 = roboto_30.render(shop_i_special, True, (255, 255, 255))
-            txt5 = roboto_30.render(player_.money, True, (255, 255, 255))
+            txt5 = roboto_30.render(str(player_.money), True, (255, 255, 255))
             win.blit(txt1, (1570, 246))
             win.blit(txt2, (1570, 378))
             win.blit(txt3, (1570, 114))
@@ -680,11 +692,17 @@ def re_draw():
     elif state == "Battle":
         b_x, b_y = pygame.mouse.get_pos()
         if battle_state == "normal":
+            battle_gold_random = 0
             if level_current == 1:
                 win.blit(battle_background_1, [0, 0])
             if music_played == True:
                 pygame.mixer.music.stop()
                 music_played = False
+
+            if battle_enemy_hp <= 0:
+                battle_state = "Won"
+            elif player_.hp <= 0:
+                battle_state = "Lost"
             
             win.blit(player_.image_battle, player_.rect)
             win.blit(battle_enemy_img, (battle_enemy_x, battle_enemy_y))
@@ -776,8 +794,11 @@ def re_draw():
             pygame.draw.rect(win, (200, 200, 200), (586, 95, round(battle_time/battle_speed*748-3), 10))
 
             # Player and Enemy HP (respectively)
-            pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
-            pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+            try:
+                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+            except:
+                pass
 
 
         if battle_state == "anim":
@@ -793,6 +814,8 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
+                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_slash":
                 if battle_anim_time < 100:
                     player_.rect.x += 2
@@ -804,6 +827,8 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
+                    temp = random.randint(player_.attack/5*-1, player_.attack/5)
+                    battle_enemy_hp -= player_.attack + temp
 
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
@@ -817,22 +842,95 @@ def re_draw():
                 music_played = False
             win.blit(player_.image_battle, player_.rect)
             win.blit(battle_enemy_img, (battle_enemy_x, battle_enemy_y))
+            win.blit(battle_bar_attacktime, (581, 90))
+            win.blit(battle_bar_hp, (581, 17))
+            win.blit(battle_bar_hp, (996, 17))
     
+
+            # Main animation queue
+            battle_speed = eval("{}.speed".format(battle_enemy))
+            if battle_time > battle_speed:
+                battle_time = 0
+                if battle_enemy == "Enemy_1":
+                    battle_queue.append("e_slash")
+            elif battle_time <= battle_speed:
+                battle_time += 1
+            else:
+                print("Error")
+
+            # Attack time bar
+            pygame.draw.rect(win, (200, 200, 200), (586, 95, round(battle_time/battle_speed*748-3), 10))
+
+            # Player and Enemy HP (respectively)
+            try:
+                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+            except:
+                print("Something might have gone wrong, or you have just finished a battle!")
+
+
+        if battle_state == "Won":
+            win.blit(battle_won, (0, 0))
+            if battle_gold_random == 0:
+                battle_gold_random = random.randint(-3, 3)
+            player_.money += battle_enemy_gold + battle_gold_random
+
+            txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
+            txt2 = roboto_120.render(str(round(player_.hp/player_.maxhp*100)), True, (255, 255, 255))
+            win.blit(txt1, (900, 300))
+            win.blit(txt2, (900, 700))
+
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                if b_x >= 1695 and b_y >= 985:
+                    # Clicked on Next button
+                    dist = 150
+                    for obj in enemies_group.sprites():
+                        center1 = obj.rect.center
+                        center2 = player_.rect.center
+
+                        diff_x = abs(center1[0] - center2[0])
+                        diff_y = abs(center1[1] - center2[1])
+
+                        # Pythagorean theorem
+                        if diff_x**2 + diff_y**2 <= dist**2:
+                            # Check so that the enemy is in the same frame
+                            if obj.slice_ == slice_:
+                                enemies_group.remove(obj)
+                                objects_group.remove(obj)
+                                enemies_dead_group.add(obj)
+                    state = "Explore_update"
+                    battle_state = "normal"
+
+
+        if battle_state == "Lost":
+            win.blit(battle_lost, (0, 0))
+            if battle_gold_random == 0:
+                battle_gold_random = random.randint(1, 3)
+            player_.money -= battle_enemy_gold * battle_gold_random
+
+            txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
+            txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
+            win.blit(txt1, (900, 300))
+            win.blit(txt2, (900, 700))
+
 
     elif state == "Battle_update":
         player_.rect.x = 50
         player_.rect.y = 650
+        player_.hp = player_.maxhp
+        battle_time = 0
 
         if battle_enemy == "Enemy_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 650
             battle_enemy_hp = 100
+            battle_enemy_maxhp = 100
+            battle_enemy_attack = 15
+            battle_enemy_gold = 10
 
         state = "Battle"
-
-
-
 
         
 def updates():
@@ -1058,11 +1156,11 @@ def updates():
         # Mouse over BUY
         if x >= 1582 and x < 1895 and y >= 950 and y < 1065:
             if mouse_1 and shop_i_cost != "n/a":
-                if int(player_.money) - int(shop_i_cost) >= 0:
+                if player_.money - int(shop_i_cost) >= 0:
                     if shop_i_selected != "None":
                         shop_i_bought.append(shop_i_selected)
                         try:
-                            player_.hp += int(shop_i_health)
+                            player_.maxhp += int(shop_i_health)
                         except:
                             pass
                         try:
@@ -1073,9 +1171,7 @@ def updates():
                         shop_i_attack = "n/a"
                         shop_i_special = "n/a"
                         shop_i_selected = "None"
-                        player_.money = int(player_.money)
                         player_.money -= int(shop_i_cost)
-                        player_.money = str(player_.money)
                         shop_i_cost = "n/a"
 
 
@@ -1096,7 +1192,7 @@ def updates():
                     exec("item_{}.image = img.load('img/item/{}_selected.png')".format(x_, item.name), globals())
                     if item.type_ == 1:
                         # sword_1
-                        shop_i_attack = "3"
+                        shop_i_attack = "30"
                         shop_i_health = "n/a"
                         shop_i_cost = "10"
                         shop_i_special = "None"
