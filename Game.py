@@ -15,7 +15,7 @@ pygame.init()
 
 state = "Title"
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
-pygame.display.set_caption("GE:START")
+pygame.display.set_caption("Blue V.2")
 clock = pygame.time.Clock()
 Title_selected = None
 Options_selected = None
