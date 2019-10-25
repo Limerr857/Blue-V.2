@@ -46,6 +46,12 @@ battle_bosses_killed = []
 battle_prevx = 0
 battle_prevy = 0
 
+battle_unlocked_shot = False
+battle_unlocked_fire = False
+battle_unlocked_ice = False
+battle_unlocked_heal = False
+battle_unlocked_brave = False
+
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
 shop_i_attack = "n/a"
@@ -91,6 +97,8 @@ battle_bar_hp = img.load("img/battle/bar_hp.png").convert()
 battle_bar_attacktime = img.load("img/battle/bar_attacktime.png").convert()
 battle_won = img.load("img/battle/won_1.png").convert()
 battle_lost = img.load("img/battle/lost_1.png").convert()
+battle_lock = img.load("img/battle/locked_1.png").convert_alpha()
+battle_retreated = img.load("img/battle/retreated_1.png").convert()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -537,6 +545,11 @@ def re_draw():
     global battle_prevgold
     global txt1
     global txt2
+    global battle_unlocked_shot
+    global battle_unlocked_fire
+    global battle_unlocked_ice
+    global battle_unlocked_heal
+    global battle_unlocked_brave
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -767,6 +780,20 @@ def re_draw():
                 win.blit(battle_menu_2, (1344, 0))
                 # TODO LATER: Make stuff "select" when mouse is over like the menu
                 
+                # If button is locked
+                if battle_unlocked_shot == False:
+                    win.blit(battle_lock, (257, 137))
+                if battle_unlocked_fire == False:
+                    win.blit(battle_lock, (257, 246))
+                if battle_unlocked_ice == False:
+                    win.blit(battle_lock, (257, 355))
+                if battle_unlocked_heal == False:
+                    win.blit(battle_lock, (1601, 28))
+                if battle_unlocked_brave == False:
+                    win.blit(battle_lock, (1601, 137))
+                #if battle_unlocked_placeholder == False:
+                    #win.blit(battle_lock, (1601, 28))
+
                 mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
                 if mouse_1:
                     if b_x >= 13 and b_x <= 563:
@@ -775,22 +802,27 @@ def re_draw():
                             # Clicked on the Slash button
                             battle_queue.append("p_slash")
                         elif b_y >= 126 and b_y <= 226:
-                            # Clicked on the Shot button
-                            battle_queue.append("p_shot")
+                            # Clicked on the Shot 
+                            if battle_unlocked_shot:
+                                battle_queue.append("p_shot")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the Fire button
-                            battle_queue.append("p_fire")
+                            if battle_unlocked_fire:
+                                battle_queue.append("p_fire")
                         elif b_y >= 334 and b_y <= 444:
                             # Clicked on the ice button
-                            battle_queue.append("p_ice")
+                            if battle_unlocked_ice:
+                                battle_queue.append("p_ice")
                     elif b_x >= 1344 and b_x <= 1920: 
                         # Mouse is probably over one of the buttons on the left.
                         if b_y >= 17 and b_y <= 117:
                             # Clicked on the Heal button
-                            battle_queue.append("p_heal")
+                            if battle_unlocked_heal:
+                                battle_queue.append("p_heal")
                         elif b_y >= 126 and b_y <= 226:
                             # Clicked on the Brave button
-                            battle_queue.append("p_brave")
+                            if battle_unlocked_brave:
+                                battle_queue.append("p_brave")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the PLACEHOLDER button
                             pass
@@ -803,6 +835,7 @@ def re_draw():
                 win.blit(battle_menu_1, (0, 0))
                 win.blit(battle_menu_3, (1344, 0))
                 mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+
                 if mouse_1:
                     if b_x >= 13 and b_x <= 563:
                         # Mouse is probably over one of the buttons on the right.
@@ -811,18 +844,21 @@ def re_draw():
                             battle_queue.append("p_slash")
                         elif b_y >= 126 and b_y <= 226:
                             # Clicked on the Shot button
-                            battle_queue.append("p_shot")
+                            if battle_unlocked_shot:
+                                battle_queue.append("p_shot")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the Fire button
-                            battle_queue.append("p_fire")
+                            if battle_unlocked_fire:
+                                battle_queue.append("p_fire")
                         elif b_y >= 334 and b_y <= 444:
                             # Clicked on the ice button
-                            battle_queue.append("p_ice")
+                            if battle_unlocked_ice:
+                                battle_queue.append("p_ice")
                     elif b_x >= 1344 and b_x <= 1920: 
                         # Mouse is probably over one of the buttons on the left.
                         if b_y >= 126 and b_y <= 226:
                             # Clicked on the Yes, retreat button
-                            pass
+                            battle_state = "Retreated"
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the No button
                             battle_menu = 1
@@ -849,10 +885,11 @@ def re_draw():
 
             # Player and Enemy HP (respectively)
             try:
-                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
-                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+                pygame.draw.rect(win, (abs(player_.hp/player_.maxhp*255-255), player_.hp/player_.maxhp*255, 0), (586, 22, round(player_.hp/player_.maxhp*333), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp/battle_enemy_maxhp*255-255), battle_enemy_hp/battle_enemy_maxhp*255, 0), (1001, 22, round(battle_enemy_hp/battle_enemy_maxhp*333), 54))
             except:
                 pass
+
 
             if battle_enemy_hp <= 0:
                 battle_state = "Won"
@@ -888,6 +925,11 @@ def re_draw():
                     battle_state = "normal"
                     temp = random.randint(player_.attack/5*-1, player_.attack/5)
                     battle_enemy_hp -= player_.attack + temp
+            
+            elif battle_animation == "e_shot":
+                pass
+            elif battle_animation == "p_shot":
+                pass
 
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
@@ -912,6 +954,8 @@ def re_draw():
                 battle_time = 0
                 if battle_enemy == "Boss_1":
                     battle_queue.append("e_slash")
+                if battle_enemy == "Zombie_1":
+                    battle_queue.append("e_slash")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -922,8 +966,10 @@ def re_draw():
 
             # Player and Enemy HP (respectively)
             try:
-                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
-                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+                pygame.draw.rect(win, (abs(player_.hp/player_.maxhp*255-255), player_.hp/player_.maxhp*255, 0), 
+                (586, 22, round(player_.hp/player_.maxhp*333), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp/battle_enemy_maxhp*255-255), battle_enemy_hp/battle_enemy_maxhp*255, 0), 
+                (1001, 22, round(battle_enemy_hp/battle_enemy_maxhp*333), 54))
             except:
                 pass
 
@@ -974,9 +1020,38 @@ def re_draw():
                 if player_.money - battle_enemy_gold * battle_gold_random >= 0:
                     player_.money -= battle_enemy_gold * battle_gold_random
 
+                    txt1 = roboto_120.render(str(battle_enemy_gold * battle_gold_random), True, (255, 255, 255))
+                else:
+                    txt1 = roboto_120.render("all", True, (255, 255, 255))
+                    player_.money = 0
+                txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
+            win.blit(txt1, (900, 300))
+            win.blit(txt2, (900, 700))
+            slice_ = level.get_startslice(leveln)
+            temp = level.get_startpos(leveln)
+            player_.rect.x = temp[0]
+            player_.rect.y = temp[1]
+
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                if b_x >= 1695 and b_y >= 985:
+                    # Clicked on Next button
+                    state = "Explore_update"
+                    battle_state = "normal"
+
+
+        if battle_state == "Retreated":
+            win.blit(battle_retreated, (0, 0))
+            if battle_gold_random == 0:
+                battle_gold_random = random.randint(1, 3)
+            if player_.money - battle_enemy_gold * battle_gold_random == battle_prevgold - battle_enemy_gold * battle_gold_random:
+                if player_.money - battle_enemy_gold + battle_gold_random >= 0:
+                    player_.money -= battle_enemy_gold + battle_gold_random
+
                     txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
                 else:
-                    txt1 = roboto_120.render("0", True, (255, 255, 255))
+                    txt1 = roboto_120.render("all", True, (255, 255, 255))
+                    player_.money = 0
                 txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
             win.blit(txt1, (900, 300))
             win.blit(txt2, (900, 700))
@@ -1018,7 +1093,7 @@ def re_draw():
             battle_enemy_hp = 100
             battle_enemy_maxhp = 100
             battle_enemy_attack = 15
-            battle_enemy_gold = 10
+            battle_enemy_gold = 5
 
         state = "Battle"
 
