@@ -977,7 +977,7 @@ def re_draw():
         if battle_state == "Won":
             win.blit(battle_won, (0, 0))
             if battle_gold_random == 0:
-                battle_gold_random = random.randint(-3, 3)
+                battle_gold_random = random.randint(-1, 3)
             if player_.money + battle_enemy_gold + battle_gold_random == battle_prevgold + battle_enemy_gold + battle_gold_random:
                 player_.money += battle_enemy_gold + battle_gold_random
 
