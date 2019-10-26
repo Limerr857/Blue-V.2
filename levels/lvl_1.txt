@@ -25,11 +25,12 @@
 "img/Backdrops/Level_1_1.png"
 [[0, 500, 500], [2, 1000, 300], [3, 1070, 600], [5, 30, 50], [4, 100, 400]]
 ["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!", "I'm the blacksmith, here you can buy upgrades for your weapons! [PRESS R]"]
-[1, 2]
+[1, 2, 3, 4, 5]
 
 # slice 2
 "img/Backdrops/Level_1_2.png"
-[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719], [10, 900, 700]]
+[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719], [14, 1709, 362], [15, 900, 500]]
+["Huh? Don't forget, south of the town there is a forest with zombies in it, you'll get some gold from each one!"]
 
 # slice 3
 "img/Backdrops/Level_1_3.png"
