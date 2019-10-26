@@ -318,7 +318,7 @@ class Player():
                             txt_pos_y = obj.rect.topleft[1]-110
 
                             keys = pygame.key.get_pressed()
-                            if keys[pygame.K_r]:
+                            if keys[pygame.K_SPACE]:
                                 # Player wants to enter the store.
                                 state = "Shop_update"
                     elif obj.type == 15:
