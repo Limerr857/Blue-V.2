@@ -62,6 +62,8 @@ shop_i_name = "n/a"
 
 x,y = 0,0
 
+pause_selected = None
+pause_state = "normal"
 
 background = img.load("img/background.png").convert()
 background.set_alpha(None)
@@ -103,6 +105,23 @@ battle_retreated = img.load("img/battle/retreated_1.png").convert()
 battle_start_1 = img.load("img/battle/start_1.png").convert()
 battle_start_2 = img.load("img/battle/start_2.png").convert()
 battle_start_3 = img.load("img/battle/start_3.png").convert()
+
+pause_background = img.load("img/pause/pause_1.png").convert()
+pause_paused = img.load("img/pause/paused.png").convert_alpha()
+pause_main_menu = img.load("img/pause/main_menu.png").convert_alpha()
+pause_exit_game = img.load("img/pause/exit_game.png").convert_alpha()
+pause_return = img.load("img/pause/return.png").convert_alpha()
+pause_save = img.load("img/pause/save.png").convert_alpha()
+pause_main_menu_isselected = img.load("img/pause/main_menu_isselected.png").convert_alpha()
+pause_exit_game_isselected = img.load("img/pause/exit_game_isselected.png").convert_alpha()
+pause_return_isselected = img.load("img/pause/return_isselected.png").convert_alpha()
+pause_save_isselected = img.load("img/pause/save_isselected.png").convert_alpha()
+pause_sure = img.load("img/pause/sure.png")
+pause_all_unsaved = img.load("img/pause/all_unsaved.png")
+pause_go_back = img.load("img/pause/go_back.png")
+pause_go_back_isselected = img.load("img/pause/go_back_isselected.png")
+pause_continue_isselected = img.load("img/pause/continue_isselected.png")
+pause_continue = img.load("img/pause/continue.png")
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -611,6 +630,10 @@ def re_draw():
     global battle_unlocked_heal
     global battle_unlocked_brave
     global battle_start_time
+    global pause_selected
+    global pause_state
+    global Title_selected
+    global run
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -702,6 +725,9 @@ def re_draw():
                         z += 1
                     b += 1
             win.blit(txt, (txt_pos_x, txt_pos_y))
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE]:
+                state = "Pause"
                 
 
     elif state == "Explore_update":
@@ -1235,7 +1261,144 @@ def re_draw():
         state = "Battle"
         battle_state = "Start_update"
 
-        
+
+    elif state == "Pause":
+        if pause_state == "normal":
+            win.blit(pause_background, (0, 0))
+            win.blit(pause_paused, (0, 0))
+
+            x, y = pygame.mouse.get_pos()
+
+            if x > 804 and x < 1116 and y > 210 and y < 389:
+                # Mouse over return
+                pause_selected = "return"
+            elif x > 697 and x < 1222 and y > 389 and y < 568:
+                # Mouse over main menu
+                pause_selected = "main_menu"
+            elif x > 852 and x < 1068 and y > 568 and y < 747:
+                # Mouse over save
+                pause_selected = "save"
+            elif x > 728 and x < 1191 and y > 901 and y < 1080:
+                # Mouse over exit game
+                pause_selected = "exit_game"
+            else:
+                pause_selected = None
+
+
+            if pause_selected == None:
+                win.blit(pause_return, (0, 210))
+                win.blit(pause_main_menu, (0, 389))
+                win.blit(pause_save, (0, 568))
+                win.blit(pause_exit_game, (0, 901))
+            elif pause_selected == "return":
+                win.blit(pause_return_isselected, (0, 210))
+                win.blit(pause_main_menu, (0, 389))
+                win.blit(pause_save, (0, 568))
+                win.blit(pause_exit_game, (0, 901))
+            elif pause_selected == "main_menu":
+                win.blit(pause_return, (0, 210))
+                win.blit(pause_main_menu_isselected, (0, 389))
+                win.blit(pause_save, (0, 568))
+                win.blit(pause_exit_game, (0, 901))
+            elif pause_selected == "save":
+                win.blit(pause_return, (0, 210))
+                win.blit(pause_main_menu, (0, 389))
+                win.blit(pause_save_isselected, (0, 568))
+                win.blit(pause_exit_game, (0, 901))
+            elif pause_selected == "exit_game":
+                win.blit(pause_return, (0, 210))
+                win.blit(pause_main_menu, (0, 389))
+                win.blit(pause_save, (0, 568))
+                win.blit(pause_exit_game_isselected, (0, 901))
+            
+            # Check for clicks
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:    
+                if pause_selected == "return":
+                    state = "Explore_update"
+                elif pause_selected == "main_menu":
+                    pause_state = "m_sure"
+                elif pause_selected == "save":
+                    state = "save"
+                elif pause_selected == "exit_game":
+                    pause_state = "e_sure"
+
+        elif pause_state == "m_sure":
+            win.blit(pause_background, (0, 0))
+            win.blit(pause_sure, (0, 0))
+
+            x, y = pygame.mouse.get_pos()
+
+            if x > 1255 and x < 1625 and y > 568 and y < 747:
+                # Mouse over go back
+                pause_selected = "go_back"
+            elif x > 269 and x < 691 and y > 568 and y < 747:
+                # Mouse over continue
+                pause_selected = "continue"
+            else:
+                pause_selected = None
+
+            if pause_selected == None:
+                win.blit(pause_continue, (0, 568))
+                win.blit(pause_go_back, (960, 568))
+            elif pause_selected == "go_back":
+                win.blit(pause_continue, (0, 568))
+                win.blit(pause_go_back_isselected, (960, 568))
+            elif pause_selected == "continue":
+                win.blit(pause_continue_isselected, (0, 568))
+                win.blit(pause_go_back, (960, 568))
+            
+            # Check for clicks
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:    
+                if pause_selected == "go_back":
+                    pause_state = "normal"
+                    pause_selected = None
+                if pause_selected == "continue":
+                    state = "Title"
+                    Title_selected = None
+                    time.sleep(0.1)
+            
+        elif pause_state == "e_sure":
+            win.blit(pause_background, (0, 0))
+            win.blit(pause_sure, (0, 0))
+
+            x, y = pygame.mouse.get_pos()
+
+            if x > 1255 and x < 1625 and y > 568 and y < 747:
+                # Mouse over go back
+                pause_selected = "go_back"
+            elif x > 269 and x < 691 and y > 568 and y < 747:
+                # Mouse over continue
+                pause_selected = "continue"
+            else:
+                pause_selected = None
+
+            if pause_selected == None:
+                win.blit(pause_continue, (0, 568))
+                win.blit(pause_go_back, (960, 568))
+            elif pause_selected == "go_back":
+                win.blit(pause_continue, (0, 568))
+                win.blit(pause_go_back_isselected, (960, 568))
+            elif pause_selected == "continue":
+                win.blit(pause_continue_isselected, (0, 568))
+                win.blit(pause_go_back, (960, 568))
+            
+            # Check for clicks
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                if pause_selected == "go_back":
+                    pause_state = "normal"
+                    pause_selected = None
+                if pause_selected == "continue":
+                    run = False
+
+    elif state == "Pause_update":
+        pause_state = "normal"
+        state = "Pause"
+        pause_selected = None
+
+
 def updates():
     global Title_selected
     global Options_selected
