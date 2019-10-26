@@ -5,6 +5,7 @@ import time
 import math
 import random
 
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 
 
@@ -22,8 +23,9 @@ object_list = [
                "img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", 
                "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
                "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png", "img/battle/zombie_1.png", 
-               "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png"
-               
+               "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png",
+               "img/battle/demon_1.png"
+
                ]
 player_width = 100
 player_height = 100
@@ -34,7 +36,7 @@ sleepy_state = "Normal"
 shop_state = "New"
 level_current = 1
 item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png"]
-battle_list = ["img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png"]
+battle_list = ["img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png"]
 battle_state = "normal"
 battle_animation = "none"
 battle_anim_time = 0
@@ -45,9 +47,15 @@ battle_enemy_hp = 100
 battle_bosses_killed = []
 battle_prevx = 0
 battle_prevy = 0
+battle_effect_1 = 10000
+battle_effect_2 = 10000
+battle_effect_3 = 10000
+battle_effect_4 = 10000
 
 battle_unlocked_shot = False
-battle_unlocked_fire = False
+# HIGLY TEMPORARY!!!!
+battle_unlocked_fire = True
+# not
 battle_unlocked_ice = False
 battle_unlocked_heal = False
 battle_unlocked_brave = False
@@ -123,6 +131,8 @@ pause_go_back_isselected = img.load("img/pause/go_back_isselected.png")
 pause_continue_isselected = img.load("img/pause/continue_isselected.png")
 pause_continue = img.load("img/pause/continue.png")
 
+effect_fire = img.load("img/effect/effect_fire.png")
+
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
 roboto_60 = pygame.font.Font("font/Roboto-Bold.ttf", 60)
@@ -135,6 +145,8 @@ txt_pos_y = 0
 music_track_2 = pygame.mixer.music.load("sound/music/menu.mp3")
 music_on = True
 music_played = False
+
+sound_fire = pygame.mixer.Sound("sound/effects/fire.wav")
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
@@ -278,6 +290,7 @@ class Player():
         self.attack = 50
         # Not temporary
         self.ranged_attack = 0
+        self.magic_attack = 0
         self.hp = 100
         self.maxhp = 100
         if True:
@@ -411,6 +424,8 @@ class Object__(pygame.sprite.Sprite):
             Door_1.__init__(self)
         elif type == 15:
             NPC_sleepy_1.__init__(self)
+        elif type == 16:
+            Demon_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -524,6 +539,15 @@ class NPC_sleepy_1(Object__):
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
+class Demon_1(Object__):
+    speed = 400 # 6.66 seconds
+    def __init__(self):
+        self.image = img.load(object_list[16])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Demon_1"
+        enemies_group.add(self)
+
 
 class Item(pygame.sprite.Sprite):
     
@@ -635,6 +659,10 @@ def re_draw():
     global pause_state
     global Title_selected
     global run
+    global battle_effect_1
+    global battle_effect_2
+    global battle_effect_3
+    global battle_effect_4
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -977,6 +1005,12 @@ def re_draw():
                         battle_queue.append("e_slash")
                     elif temp == 3:
                         battle_queue.append("e_shot")
+                if battle_enemy == "Demon_1":
+                    temp = random.randint(1, 10)
+                    if temp < 10:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1058,6 +1092,59 @@ def re_draw():
                     battle_state = "normal"
                     temp = random.randint(player_.ranged_attack/5*-1, player_.ranged_attack/5)
                     battle_enemy_hp -= player_.ranged_attack + temp
+            
+            elif battle_animation == "e_fire":
+                if battle_anim_time == 0:
+                    sound_fire.play()
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 50:
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                    battle_enemy_x += 2
+                    battle_anim_time += 2
+                    # Fire effect
+                    temp = random.randint(-5, 105)
+                    temp2 = random.randint(-5, 105)
+                    win.blit(effect_fire, (player_.rect.x + temp, player_.rect.y + temp2))
+                elif battle_anim_time > 100:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    player_.hp -= battle_enemy_attack + temp
+            elif battle_animation == "p_fire":
+                if battle_anim_time == 0:
+                    sound_fire.play()
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 50:
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                    battle_effect_1 = 10000
+                    battle_effect_2 = 10000
+                    battle_effect_3 = 10000
+                    battle_effect_4 = 10000
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                    player_.rect.x -= 2
+                    battle_anim_time += 2
+                    # Fire effect
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_1 = random.randint(-15, 95)
+                        battle_effect_2 = random.randint(-15, 95)
+                        battle_effect_3 = random.randint(-15, 95)
+                        battle_effect_4 = random.randint(-15, 95)
+                elif battle_anim_time > 100:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(player_.magic_attack/5*-1, player_.magic_attack/5)
+                    battle_enemy_hp -= player_.magic_attack + temp
+                    battle_effect_1 = 10000
+                    battle_effect_2 = 10000
+                    battle_effect_3 = 10000
+                    battle_effect_4 = 10000
 
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
@@ -1074,6 +1161,8 @@ def re_draw():
             win.blit(battle_bar_attacktime, (581, 90))
             win.blit(battle_bar_hp, (581, 17))
             win.blit(battle_bar_hp, (996, 17))
+            win.blit(effect_fire, (battle_enemy_x + battle_effect_1, battle_enemy_y + battle_effect_2))
+            win.blit(effect_fire, (battle_enemy_x + battle_effect_3, battle_enemy_y + battle_effect_4))
     
 
             # Main animation queue
@@ -1090,6 +1179,12 @@ def re_draw():
                         battle_queue.append("e_slash")
                     elif temp == 3:
                         battle_queue.append("e_shot")
+                if battle_enemy == "Demon_1":
+                    temp = random.randint(1, 10)
+                    if temp < 10:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1252,6 +1347,14 @@ def re_draw():
             battle_enemy_hp = 400
             battle_enemy_maxhp = 400
             battle_enemy_attack = 30
+            battle_enemy_gold = 20
+        elif battle_enemy == "Demon_1":
+            battle_enemy_img = img.load(battle_list[3]).convert()
+            battle_enemy_x = 1800
+            battle_enemy_y = 650
+            battle_enemy_hp = 300
+            battle_enemy_maxhp = 300
+            battle_enemy_attack = 35
             battle_enemy_gold = 20
 
         state = "Battle"
