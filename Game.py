@@ -303,37 +303,38 @@ class Player():
 
             # Pythagorean theorem
             if diff_x**2 + diff_y**2 <= dist**2:
-                if obj.type == 3:
-                    # Tophat
-                    if tophat_state == "Save":
-                        global txt
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = obj.rect.topleft[0]-63
-                        txt_pos_y = obj.rect.topleft[1]-100
-                elif obj.type == 4:
-                    # Blacksmith
-                    if blacksmith_state == "New":
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[1]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = obj.rect.topleft[0]-63
-                        txt_pos_y = obj.rect.topleft[1]-110
+                if obj.slice_ == slice_:
+                    if obj.type == 3:
+                        # Tophat
+                        if tophat_state == "Save":
+                            global txt
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-100
+                    elif obj.type == 4:
+                        # Blacksmith
+                        if blacksmith_state == "New":
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[1]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-110
 
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_r]:
-                            # Player wants to enter the store.
-                            state = "Shop_update"
-                elif obj.type == 15:
-                    # Sleepy
-                    if sleepy_state == "Normal":
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = obj.rect.topleft[0]-63
-                        txt_pos_y = obj.rect.topleft[1]-20
-                break
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_r]:
+                                # Player wants to enter the store.
+                                state = "Shop_update"
+                    elif obj.type == 15:
+                        # Sleepy
+                        if sleepy_state == "Normal":
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-20
+                    break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
                 txt_pos_x = 0
