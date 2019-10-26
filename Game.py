@@ -277,6 +277,7 @@ class Player():
         self.money = 15
         self.attack = 50
         # Not temporary
+        self.ranged_attack = 0
         self.hp = 100
         self.maxhp = 100
         if True:
@@ -1032,31 +1033,31 @@ def re_draw():
                     battle_enemy_hp -= player_.attack + temp
             
             elif battle_animation == "e_shot":
-                if battle_anim_time < 50:
+                if battle_anim_time < 25:
                     battle_enemy_x -= 2
                     battle_anim_time += 2
-                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                elif battle_anim_time >= 25 and battle_anim_time <= 50:
                     battle_enemy_x += 2
                     battle_anim_time += 2
-                elif battle_anim_time > 100:
+                elif battle_anim_time > 50:
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
                     temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_shot":
-                if battle_anim_time < 50:
+                if battle_anim_time < 25:
                     player_.rect.x += 2
                     battle_anim_time += 2
-                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                elif battle_anim_time >= 25 and battle_anim_time <= 50:
                     player_.rect.x -= 2
                     battle_anim_time += 2
-                elif battle_anim_time > 100:
+                elif battle_anim_time > 50:
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.attack/5*-1, player_.attack/5)
-                    battle_enemy_hp -= player_.attack + temp
+                    temp = random.randint(player_.ranged_attack/5*-1, player_.ranged_attack/5)
+                    battle_enemy_hp -= player_.ranged_attack + temp
 
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
@@ -1655,10 +1656,16 @@ def updates():
                         except:
                             pass
                         try:
-                            if player_.attack < int(shop_i_attack):
-                                player_.attack = int(shop_i_attack)
-                            else:
-                                player_.attack += int(shop_i_attack)/3
+                            if shop_i_selected != "bow_1":
+                                if player_.attack < int(shop_i_attack):
+                                    player_.attack = int(shop_i_attack)
+                                else:
+                                    player_.attack += int(shop_i_attack)/3
+                            elif shop_i_selected != "bow_1":
+                                if player_.ranged_attack < int(shop_i_attack):
+                                    player_.ranged_attack = int(shop_i_attack)
+                                else:
+                                    player_.ranged_attack += int(shop_i_attack)/3
                         except:
                             pass
                         if shop_i_selected == "bow_1":
