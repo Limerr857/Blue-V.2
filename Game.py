@@ -7,11 +7,6 @@ import random
 
 pygame.init()
 
-# Almost total re-write of code neccesary to make enemies disappear.
-# Bosses should be the only enemies that are visible, all other enemies are randomly generated based on slice, level etc.
-# Don't forget to put this new test verision into another branch. 
-# Also, don't forget that you will have re-written this eventually.
-
 
 state = "Title"
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
@@ -22,18 +17,24 @@ Options_selected = None
 Play_selected = None
 Load_game_disabled = True
 player_state = "normal"
-object_list = ["img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", 
+object_list = [
+    
+               "img/obj/rock_1.png", "img/obj/rock_2.png", "img/obj/house_1.png", "img/NPC/tophat_happy.png", 
                "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
-               "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png"]
+               "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png", "img/battle/zombie_1.png", 
+               "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png"
+               
+               ]
 player_width = 100
 player_height = 100
 prev_failed_key = None
 tophat_state = "Save"
 blacksmith_state = "New"
+sleepy_state = "Normal"
 shop_state = "New"
 level_current = 1
-item_list = ["img/item/sword_1.png", "img/item/shield_1.png"]
-battle_list = ["img/battle/enemy_battle.png"]
+item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png"]
+battle_list = ["img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png"]
 battle_state = "normal"
 battle_animation = "none"
 battle_anim_time = 0
@@ -41,6 +42,15 @@ battle_menu = 1
 battle_queue = []
 battle_time = 0
 battle_enemy_hp = 100
+battle_bosses_killed = []
+battle_prevx = 0
+battle_prevy = 0
+
+battle_unlocked_shot = False
+battle_unlocked_fire = False
+battle_unlocked_ice = False
+battle_unlocked_heal = False
+battle_unlocked_brave = False
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -48,6 +58,7 @@ shop_i_attack = "n/a"
 shop_i_special = "n/a"
 shop_i_selected = "None"
 shop_i_bought = []
+shop_i_name = "n/a"
 
 x,y = 0,0
 
@@ -87,6 +98,11 @@ battle_bar_hp = img.load("img/battle/bar_hp.png").convert()
 battle_bar_attacktime = img.load("img/battle/bar_attacktime.png").convert()
 battle_won = img.load("img/battle/won_1.png").convert()
 battle_lost = img.load("img/battle/lost_1.png").convert()
+battle_lock = img.load("img/battle/locked_1.png").convert_alpha()
+battle_retreated = img.load("img/battle/retreated_1.png").convert()
+battle_start_1 = img.load("img/battle/start_1.png").convert()
+battle_start_2 = img.load("img/battle/start_2.png").convert()
+battle_start_3 = img.load("img/battle/start_3.png").convert()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -105,7 +121,6 @@ objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
 items_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
-enemies_dead_group = pygame.sprite.Group()
 
 
 class Level():
@@ -211,6 +226,18 @@ class Level():
             elif found > 0:
                 found += 1
             x +=1
+    
+
+    def get_spawns(self, name, slice_):
+        f = open("levels/{}.txt".format(name), "r")
+        found = 0
+        x = 0
+        for line in f.readlines():
+            if found == 1:
+                return eval(line)
+            elif "# slice {} spawns".format(slice_) in line:
+                found = 1
+            x +=1
             
 lvl_1 = Level()
 
@@ -218,6 +245,7 @@ lvl_1 = Level()
 class Player():
     global tophat_state
     global slice_
+    global sleepy_state
 
     def __init__(self):
         self.image = img.load("img/player_normal.png").convert_alpha()
@@ -227,7 +255,7 @@ class Player():
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
         # Temporary
-        self.money = 9999
+        self.money = 15
         self.attack = 50
         # Not temporary
         self.hp = 100
@@ -247,6 +275,7 @@ class Player():
         global state
         global slice_
         global battle_enemy
+        global battle_bosses_killed
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
@@ -269,29 +298,38 @@ class Player():
 
             # Pythagorean theorem
             if diff_x**2 + diff_y**2 <= dist**2:
-                if obj.type == 3:
-                    # Tophat
-                    if tophat_state == "Save":
-                        global txt
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = obj.rect.topleft[0]-63
-                        txt_pos_y = obj.rect.topleft[1]-100
-                elif obj.type == 4:
-                    # Blacksmith
-                    if blacksmith_state == "New":
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[1]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = obj.rect.topleft[0]-63
-                        txt_pos_y = obj.rect.topleft[1]-110
+                if obj.slice_ == slice_:
+                    if obj.type == 3:
+                        # Tophat
+                        if tophat_state == "Save":
+                            global txt
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-100
+                    elif obj.type == 4:
+                        # Blacksmith
+                        if blacksmith_state == "New":
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[1]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-110
 
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_r]:
-                            # Player wants to enter the store.
-                            state = "Shop_update"
-                break
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_r]:
+                                # Player wants to enter the store.
+                                state = "Shop_update"
+                    elif obj.type == 15:
+                        # Sleepy
+                        if sleepy_state == "Normal":
+                            txt = lvl_1.get_text("lvl_1", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = obj.rect.topleft[0]-63
+                            txt_pos_y = obj.rect.topleft[1]-20
+                    break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
                 txt_pos_x = 0
@@ -300,18 +338,19 @@ class Player():
         
         dist = 150
         for obj in enemies_group.sprites():
-            center1 = obj.rect.center
-            center2 = player_.rect.center
+            if obj.type not in battle_bosses_killed:
+                center1 = obj.rect.center
+                center2 = player_.rect.center
 
-            diff_x = abs(center1[0] - center2[0])
-            diff_y = abs(center1[1] - center2[1])
+                diff_x = abs(center1[0] - center2[0])
+                diff_y = abs(center1[1] - center2[1])
 
-            # Pythagorean theorem
-            if diff_x**2 + diff_y**2 <= dist**2:
-                # Check so that the enemy is in the same frame
-                if obj.slice_ == slice_:
-                    battle_enemy = obj.name
-                    state = "Battle_update"
+                # Pythagorean theorem
+                if diff_x**2 + diff_y**2 <= dist**2:
+                    # Check so that the enemy is in the same frame
+                    if obj.slice_ == slice_:
+                        battle_enemy = obj.name
+                        state = "Battle_update"
 
 player_ = Player()
 
@@ -341,7 +380,17 @@ class Object__(pygame.sprite.Sprite):
         elif type == 9:
             Wall_4.__init__(self)
         elif type == 10:
-            Enemy_1.__init__(self)
+            Boss_1.__init__(self)
+        elif type == 11:
+            Zombie_1.__init__(self)
+        elif type == 12:
+            Tree_1.__init__(self)
+        elif type == 13:
+            Tree_2.__init__(self)
+        elif type == 14:
+            Door_1.__init__(self)
+        elif type == 15:
+            NPC_sleepy_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -409,14 +458,51 @@ class Wall_4(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
-class Enemy_1(Object__):
+class Boss_1(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
         self.image = img.load(object_list[10])
         self.setup()
         self.rect = self.image.get_rect()
-        self.name = "Enemy_1"
+        self.name = "Boss_1"
         enemies_group.add(self)
+
+class Zombie_1(Object__):
+    speed = 300 # 5 seconds
+    def __init__(self):
+        self.image = img.load(object_list[11])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_1"
+        enemies_group.add(self)
+
+class Tree_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[12])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Tree_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[13])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Door_1(Object__):
+    speed = 300 # 5 seconds
+    def __init__(self):
+        self.image = img.load(object_list[14])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Door_1"
+        enemies_group.add(self)
+
+class NPC_sleepy_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[15])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
 
 
 class Item(pygame.sprite.Sprite):
@@ -430,6 +516,12 @@ class Item(pygame.sprite.Sprite):
             Sword_1.__init__(self)
         elif type_ == 2:
             Shield_1.__init__(self)
+        elif type_ == 3:
+            Bow_1.__init__(self)
+        elif type_ == 4:
+            Sword_2.__init__(self)
+        elif type_ == 5:
+            Shield_2.__init__(self)
 
 class Sword_1(Item):
     def __init__(self):
@@ -444,6 +536,27 @@ class Shield_1(Item):
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_1"
+
+class Bow_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[2])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "bow_1"
+    
+class Sword_2(Item):
+    def __init__(self):
+        self.image = img.load(item_list[0])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "sword_2"
+
+class Shield_2(Item):
+    def __init__(self):
+        self.image = img.load(item_list[1])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_2"
 
 
 def re_draw():
@@ -486,6 +599,18 @@ def re_draw():
     global battle_enemy_attack
     global battle_enemy_gold
     global battle_gold_random
+    global battle_bosses_killed
+    global battle_prevx
+    global battle_prevy
+    global battle_prevgold
+    global txt1
+    global txt2
+    global battle_unlocked_shot
+    global battle_unlocked_fire
+    global battle_unlocked_ice
+    global battle_unlocked_heal
+    global battle_unlocked_brave
+    global battle_start_time
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -571,8 +696,9 @@ def re_draw():
                         elif z == 1:
                             x = e
                         elif z == 2:
-                            y = e
-                            exec("win.blit(object_{}.image, ({}, {}))".format(nr, x, y))
+                            y = e 
+                            string = """if object_{}.type not in battle_bosses_killed: win.blit(object_{}.image, ({}, {}))""".format(nr, nr, x, y)
+                            exec(string)
                         z += 1
                     b += 1
             win.blit(txt, (txt_pos_x, txt_pos_y))
@@ -605,11 +731,12 @@ def re_draw():
                             x = e
                         elif z == 2:
                             y = e
-                            exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y), globals())
-                            exec("objects_group.add(object_{})".format(nr), globals())
-                            exec("object_{}.rect.x = {}".format(nr, x))
-                            exec("object_{}.rect.y = {}".format(nr, y))
-                            exec("object_{}.slice_ = {}".format(nr, slice_))
+                            if type_ not in battle_bosses_killed:
+                                exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y), globals())
+                                exec("objects_group.add(object_{})".format(nr), globals())
+                                exec("object_{}.rect.x = {}".format(nr, x))
+                                exec("object_{}.rect.y = {}".format(nr, y))
+                                exec("object_{}.slice_ = {}".format(nr, slice_))
                         z += 1
                     a += 1
                 
@@ -682,11 +809,13 @@ def re_draw():
             txt3 = roboto_30.render(shop_i_cost, True, (255, 255, 255))
             txt4 = roboto_30.render(shop_i_special, True, (255, 255, 255))
             txt5 = roboto_30.render(str(player_.money), True, (255, 255, 255))
+            txt6 = roboto_30.render(shop_i_name, True, (255, 255, 255))
             win.blit(txt1, (1570, 246))
             win.blit(txt2, (1570, 378))
             win.blit(txt3, (1570, 114))
             win.blit(txt4, (1570, 510))
             win.blit(txt5, (1570, 779))
+            win.blit(txt6, (1570, 642))
 
 
     elif state == "Battle":
@@ -715,6 +844,20 @@ def re_draw():
                 win.blit(battle_menu_2, (1344, 0))
                 # TODO LATER: Make stuff "select" when mouse is over like the menu
                 
+                # If button is locked
+                if battle_unlocked_shot == False:
+                    win.blit(battle_lock, (257, 137))
+                if battle_unlocked_fire == False:
+                    win.blit(battle_lock, (257, 246))
+                if battle_unlocked_ice == False:
+                    win.blit(battle_lock, (257, 355))
+                if battle_unlocked_heal == False:
+                    win.blit(battle_lock, (1601, 28))
+                if battle_unlocked_brave == False:
+                    win.blit(battle_lock, (1601, 137))
+                #if battle_unlocked_placeholder == False:
+                    #win.blit(battle_lock, (1601, 28))
+
                 mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
                 if mouse_1:
                     if b_x >= 13 and b_x <= 563:
@@ -723,22 +866,27 @@ def re_draw():
                             # Clicked on the Slash button
                             battle_queue.append("p_slash")
                         elif b_y >= 126 and b_y <= 226:
-                            # Clicked on the Shot button
-                            battle_queue.append("p_shot")
+                            # Clicked on the Shot 
+                            if battle_unlocked_shot:
+                                battle_queue.append("p_shot")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the Fire button
-                            battle_queue.append("p_fire")
+                            if battle_unlocked_fire:
+                                battle_queue.append("p_fire")
                         elif b_y >= 334 and b_y <= 444:
                             # Clicked on the ice button
-                            battle_queue.append("p_ice")
+                            if battle_unlocked_ice:
+                                battle_queue.append("p_ice")
                     elif b_x >= 1344 and b_x <= 1920: 
                         # Mouse is probably over one of the buttons on the left.
                         if b_y >= 17 and b_y <= 117:
                             # Clicked on the Heal button
-                            battle_queue.append("p_heal")
+                            if battle_unlocked_heal:
+                                battle_queue.append("p_heal")
                         elif b_y >= 126 and b_y <= 226:
                             # Clicked on the Brave button
-                            battle_queue.append("p_brave")
+                            if battle_unlocked_brave:
+                                battle_queue.append("p_brave")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the PLACEHOLDER button
                             pass
@@ -751,6 +899,21 @@ def re_draw():
                 win.blit(battle_menu_1, (0, 0))
                 win.blit(battle_menu_3, (1344, 0))
                 mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+
+                # If button is locked
+                if battle_unlocked_shot == False:
+                    win.blit(battle_lock, (257, 137))
+                if battle_unlocked_fire == False:
+                    win.blit(battle_lock, (257, 246))
+                if battle_unlocked_ice == False:
+                    win.blit(battle_lock, (257, 355))
+                if battle_unlocked_heal == False:
+                    win.blit(battle_lock, (1601, 28))
+                if battle_unlocked_brave == False:
+                    win.blit(battle_lock, (1601, 137))
+                #if battle_unlocked_placeholder == False:
+                    #win.blit(battle_lock, (1601, 28))
+
                 if mouse_1:
                     if b_x >= 13 and b_x <= 563:
                         # Mouse is probably over one of the buttons on the right.
@@ -759,18 +922,21 @@ def re_draw():
                             battle_queue.append("p_slash")
                         elif b_y >= 126 and b_y <= 226:
                             # Clicked on the Shot button
-                            battle_queue.append("p_shot")
+                            if battle_unlocked_shot:
+                                battle_queue.append("p_shot")
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the Fire button
-                            battle_queue.append("p_fire")
+                            if battle_unlocked_fire:
+                                battle_queue.append("p_fire")
                         elif b_y >= 334 and b_y <= 444:
                             # Clicked on the ice button
-                            battle_queue.append("p_ice")
+                            if battle_unlocked_ice:
+                                battle_queue.append("p_ice")
                     elif b_x >= 1344 and b_x <= 1920: 
                         # Mouse is probably over one of the buttons on the left.
                         if b_y >= 126 and b_y <= 226:
                             # Clicked on the Yes, retreat button
-                            pass
+                            battle_state = "Retreated"
                         elif b_y >= 235 and b_y <= 335:
                             # Clicked on the No button
                             battle_menu = 1
@@ -779,8 +945,16 @@ def re_draw():
             battle_speed = eval("{}.speed".format(battle_enemy))
             if battle_time > battle_speed:
                 battle_time = 0
-                if battle_enemy == "Enemy_1":
+                if battle_enemy == "Boss_1":
                     battle_queue.append("e_slash")
+                if battle_enemy == "Zombie_1":
+                    battle_queue.append("e_slash")
+                if battle_enemy == "Door_1":
+                    temp = random.randint(1, 3)
+                    if temp == 1 or temp == 2:
+                        battle_queue.append("e_slash")
+                    elif temp == 3:
+                        battle_queue.append("e_shot")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -795,10 +969,16 @@ def re_draw():
 
             # Player and Enemy HP (respectively)
             try:
-                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
-                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+                pygame.draw.rect(win, (abs(player_.hp/player_.maxhp*255-255), player_.hp/player_.maxhp*255, 0), (586, 22, round(player_.hp/player_.maxhp*333), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp/battle_enemy_maxhp*255-255), battle_enemy_hp/battle_enemy_maxhp*255, 0), (1001, 22, round(battle_enemy_hp/battle_enemy_maxhp*333), 54))
             except:
                 pass
+
+
+            if battle_enemy_hp <= 0:
+                battle_state = "Won"
+            elif player_.hp <= 0:
+                battle_state = "Lost"
 
 
         if battle_state == "anim":
@@ -817,6 +997,33 @@ def re_draw():
                     temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_slash":
+                if battle_anim_time < 100:
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                    player_.rect.x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time > 200:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(player_.attack/5*-1, player_.attack/5)
+                    battle_enemy_hp -= player_.attack + temp
+            
+            elif battle_animation == "e_shot":
+                if battle_anim_time < 100:
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                    battle_enemy_x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time > 200:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    player_.hp -= battle_enemy_attack + temp
+            elif battle_animation == "p_shot":
                 if battle_anim_time < 100:
                     player_.rect.x += 2
                     battle_anim_time += 2
@@ -851,8 +1058,16 @@ def re_draw():
             battle_speed = eval("{}.speed".format(battle_enemy))
             if battle_time > battle_speed:
                 battle_time = 0
-                if battle_enemy == "Enemy_1":
+                if battle_enemy == "Boss_1":
                     battle_queue.append("e_slash")
+                if battle_enemy == "Zombie_1":
+                    battle_queue.append("e_slash")
+                if battle_enemy == "Door_1":
+                    temp = random.randint(1, 3)
+                    if temp == 1 or temp == 2:
+                        battle_queue.append("e_slash")
+                    elif temp == 3:
+                        battle_queue.append("e_shot")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -863,28 +1078,33 @@ def re_draw():
 
             # Player and Enemy HP (respectively)
             try:
-                pygame.draw.rect(win, (abs(player_.hp*2.55-255), player_.hp*2.55, 0), (586, 22, round(player_.hp*3.33), 54))
-                pygame.draw.rect(win, (abs(battle_enemy_hp*2.55-255), battle_enemy_hp*2.55, 0), (1001, 22, round(battle_enemy_hp*3.33), 54))
+                pygame.draw.rect(win, (abs(player_.hp/player_.maxhp*255-255), player_.hp/player_.maxhp*255, 0), 
+                (586, 22, round(player_.hp/player_.maxhp*333), 54))
+                pygame.draw.rect(win, (abs(battle_enemy_hp/battle_enemy_maxhp*255-255), battle_enemy_hp/battle_enemy_maxhp*255, 0), 
+                (1001, 22, round(battle_enemy_hp/battle_enemy_maxhp*333), 54))
             except:
-                print("Something might have gone wrong, or you have just finished a battle!")
+                pass
 
 
         if battle_state == "Won":
             win.blit(battle_won, (0, 0))
             if battle_gold_random == 0:
-                battle_gold_random = random.randint(-3, 3)
-            player_.money += battle_enemy_gold + battle_gold_random
+                battle_gold_random = random.randint(-1, 3)
+            if player_.money + battle_enemy_gold + battle_gold_random == battle_prevgold + battle_enemy_gold + battle_gold_random:
+                player_.money += battle_enemy_gold + battle_gold_random
 
-            txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
-            txt2 = roboto_120.render(str(round(player_.hp/player_.maxhp*100)), True, (255, 255, 255))
+                txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
+                txt2 = roboto_120.render(str(round(player_.hp/player_.maxhp*100)), True, (255, 255, 255))
             win.blit(txt1, (900, 300))
             win.blit(txt2, (900, 700))
+            player_.rect.x = battle_prevx
+            player_.rect.y = battle_prevy
 
             mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
             if mouse_1:
                 if b_x >= 1695 and b_y >= 985:
                     # Clicked on Next button
-                    dist = 150
+                    dist = 300
                     for obj in enemies_group.sprites():
                         center1 = obj.rect.center
                         center2 = player_.rect.center
@@ -898,7 +1118,8 @@ def re_draw():
                             if obj.slice_ == slice_:
                                 enemies_group.remove(obj)
                                 objects_group.remove(obj)
-                                enemies_dead_group.add(obj)
+                                if obj.type not in battle_bosses_killed:
+                                    battle_bosses_killed.append(obj.type)
                     state = "Explore_update"
                     battle_state = "normal"
 
@@ -907,30 +1128,112 @@ def re_draw():
             win.blit(battle_lost, (0, 0))
             if battle_gold_random == 0:
                 battle_gold_random = random.randint(1, 3)
-            player_.money -= battle_enemy_gold * battle_gold_random
+            if player_.money - battle_enemy_gold * battle_gold_random == battle_prevgold - battle_enemy_gold * battle_gold_random:
+                if player_.money - battle_enemy_gold * battle_gold_random >= 0:
+                    player_.money -= battle_enemy_gold * battle_gold_random
 
-            txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
-            txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
+                    txt1 = roboto_120.render(str(battle_enemy_gold * battle_gold_random), True, (255, 255, 255))
+                else:
+                    txt1 = roboto_120.render("all", True, (255, 255, 255))
+                    player_.money = 0
+                txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
             win.blit(txt1, (900, 300))
             win.blit(txt2, (900, 700))
+            slice_ = level.get_startslice(leveln)
+            temp = level.get_startpos(leveln)
+            player_.rect.x = temp[0]
+            player_.rect.y = temp[1]
+
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                if b_x >= 1695 and b_y >= 985:
+                    # Clicked on Next button
+                    state = "Explore_update"
+                    battle_state = "normal"
+
+
+        if battle_state == "Retreated":
+            win.blit(battle_retreated, (0, 0))
+            if battle_gold_random == 0:
+                battle_gold_random = random.randint(1, 3)
+            if player_.money - battle_enemy_gold * battle_gold_random == battle_prevgold - battle_enemy_gold * battle_gold_random:
+                if player_.money - battle_enemy_gold + battle_gold_random >= 0:
+                    player_.money -= battle_enemy_gold + battle_gold_random
+
+                    txt1 = roboto_120.render(str(battle_enemy_gold + battle_gold_random), True, (255, 255, 255))
+                else:
+                    txt1 = roboto_120.render("all", True, (255, 255, 255))
+                    player_.money = 0
+                txt2 = roboto_120.render(str(round(battle_enemy_hp/battle_enemy_maxhp*100)), True, (255, 255, 255))
+            win.blit(txt1, (900, 300))
+            win.blit(txt2, (900, 700))
+            slice_ = level.get_startslice(leveln)
+            temp = level.get_startpos(leveln)
+            player_.rect.x = temp[0]
+            player_.rect.y = temp[1]
+
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                if b_x >= 1695 and b_y >= 985:
+                    # Clicked on Next button
+                    state = "Explore_update"
+                    battle_state = "normal"
+
+
+        if battle_state == "Start":
+            if battle_start_time <= 60:
+                win.blit(battle_start_1, (0, 0))
+            elif battle_start_time <= 120:
+                win.blit(battle_start_2, (0, 0))
+            elif battle_start_time <= 180:
+                win.blit(battle_start_3, (0, 0))
+            elif battle_start_time > 180:
+                battle_state = "normal" 
+            battle_start_time += 1
+        
+
+        if battle_state == "Start_update":
+            battle_start_time = 0
+            battle_state = "Start"
 
 
     elif state == "Battle_update":
+        battle_prevx = player_.rect.x
+        battle_prevy = player_.rect.y
         player_.rect.x = 50
         player_.rect.y = 650
         player_.hp = player_.maxhp
         battle_time = 0
+        battle_prevgold = player_.money
+        battle_menu = 1
 
-        if battle_enemy == "Enemy_1":
+        if battle_enemy == "Boss_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 650
             battle_enemy_hp = 100
             battle_enemy_maxhp = 100
             battle_enemy_attack = 15
+            battle_enemy_gold = 100
+        elif battle_enemy == "Zombie_1":
+            battle_enemy_img = img.load(battle_list[1]).convert_alpha()
+            battle_enemy_x = 1800
+            battle_enemy_y = 650
+            battle_enemy_hp = 100
+            battle_enemy_maxhp = 100
+            battle_enemy_attack = 15
             battle_enemy_gold = 10
+        elif battle_enemy == "Door_1":
+            battle_enemy_img = img.load(battle_list[2]).convert()
+            battle_enemy_x = 1500
+            battle_enemy_y = 600
+            battle_enemy_hp = 400
+            battle_enemy_maxhp = 400
+            battle_enemy_attack = 30
+            battle_enemy_gold = 20
 
         state = "Battle"
+        battle_state = "Start_update"
 
         
 def updates():
@@ -959,6 +1262,8 @@ def updates():
     global music_on
     global music_played
     global shop_i_bought
+    global battle_enemy
+    global shop_i_name
     x, y = pygame.mouse.get_pos()
 
     if state == "Title":
@@ -1141,6 +1446,25 @@ def updates():
                         else:
                             player_.rect.y += vel
 
+
+            spawns = level.get_spawns(leveln, slice_)
+            if spawns != None:
+                for spawn in spawns:
+                    x = 0
+                    for i in spawn:
+                        if x == 0:
+                            temp1 = i
+                        elif x == 1:
+                            temp2 = random.randint(0, i) 
+                            if temp2 == 1:
+                                if temp1 == 11:
+                                    battle_enemy = "Zombie_1"
+                                    state = "Battle_update"
+                        x += 1
+                        
+
+                        
+
             # Collision
             player_.Collide(objects_group)
 
@@ -1160,11 +1484,17 @@ def updates():
                     if shop_i_selected != "None":
                         shop_i_bought.append(shop_i_selected)
                         try:
-                            player_.maxhp += int(shop_i_health)
+                            if plater_.maxhp < int(shop_i_health):
+                                player_.maxhp = int(shop_i_health)
+                            else:
+                                player_.maxhp += int(shop_i_health)/3
                         except:
                             pass
                         try:
-                            player_.attack += int(shop_i_attack)
+                            if player_.attack < int(shop_i_attack):
+                                player_.attack = int(shop_i_attack)
+                            else:
+                                player_.attack += int(shop_i_attack)/3
                         except:
                             pass
                         shop_i_health = "n/a"
@@ -1173,6 +1503,7 @@ def updates():
                         shop_i_selected = "None"
                         player_.money -= int(shop_i_cost)
                         shop_i_cost = "n/a"
+                        shop_i_name = "n/a"
 
 
         for item in items_group:
@@ -1197,6 +1528,7 @@ def updates():
                         shop_i_cost = "10"
                         shop_i_special = "None"
                         shop_i_selected = "sword_1"
+                        shop_i_name = "Bronze Sword"
                     if item.type_ == 2:
                         # shield_1
                         shop_i_attack = "n/a"
@@ -1204,6 +1536,31 @@ def updates():
                         shop_i_cost = "5"
                         shop_i_special = "None"
                         shop_i_selected = "shield_1"
+                        shop_i_name = "Bronze Shield"
+                    if item.type_ == 3:
+                        # bow_1
+                        shop_i_attack = "15"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "25"
+                        shop_i_special = "None"
+                        shop_i_selected = "bow_1"
+                        shop_i_name = "Shortbow"
+                    if item.type_ == 4:
+                        # sword_2
+                        shop_i_attack = "10"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "50"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_2"
+                        shop_i_name = "Iron Sword"
+                    if item.type_ == 5:
+                        # shield_2
+                        shop_i_attack = "n/a"
+                        shop_i_health = "150"
+                        shop_i_cost = "70"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_2"
+                        shop_i_name = "Iron Shield"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:
