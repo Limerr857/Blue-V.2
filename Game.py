@@ -7,11 +7,6 @@ import random
 
 pygame.init()
 
-# Almost total re-write of code neccesary to make enemies disappear.
-# Bosses should be the only enemies that are visible, all other enemies are randomly generated based on slice, level etc.
-# Don't forget to put this new test verision into another branch. 
-# Also, don't forget that you will have re-written this eventually.
-
 
 state = "Title"
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
