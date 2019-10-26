@@ -933,11 +933,6 @@ def re_draw():
                     win.blit(battle_lock, (257, 246))
                 if battle_unlocked_ice == False:
                     win.blit(battle_lock, (257, 355))
-                if battle_unlocked_heal == False:
-                    win.blit(battle_lock, (1601, 28))
-                if battle_unlocked_brave == False:
-                    win.blit(battle_lock, (1601, 137))
-                #if battle_unlocked_placeholder == False:
                     #win.blit(battle_lock, (1601, 28))
 
                 if mouse_1:
@@ -1037,26 +1032,26 @@ def re_draw():
                     battle_enemy_hp -= player_.attack + temp
             
             elif battle_animation == "e_shot":
-                if battle_anim_time < 100:
+                if battle_anim_time < 50:
                     battle_enemy_x -= 2
                     battle_anim_time += 2
-                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
                     battle_enemy_x += 2
                     battle_anim_time += 2
-                elif battle_anim_time > 200:
+                elif battle_anim_time > 100:
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
                     temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_shot":
-                if battle_anim_time < 100:
+                if battle_anim_time < 50:
                     player_.rect.x += 2
                     battle_anim_time += 2
-                elif battle_anim_time >= 100 and battle_anim_time <= 200:
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
                     player_.rect.x -= 2
                     battle_anim_time += 2
-                elif battle_anim_time > 200:
+                elif battle_anim_time > 100:
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
@@ -1393,6 +1388,7 @@ def re_draw():
                 if pause_selected == "continue":
                     run = False
 
+
     elif state == "Pause_update":
         pause_state = "normal"
         state = "Pause"
@@ -1427,6 +1423,11 @@ def updates():
     global shop_i_bought
     global battle_enemy
     global shop_i_name
+    global battle_unlocked_shot
+    global battle_unlocked_brave
+    global battle_unlocked_fire
+    global battle_unlocked_heal
+    global battle_unlocked_ice
     x, y = pygame.mouse.get_pos()
 
     if state == "Title":
@@ -1660,6 +1661,8 @@ def updates():
                                 player_.attack += int(shop_i_attack)/3
                         except:
                             pass
+                        if shop_i_selected == "bow_1":
+                            battle_unlocked_shot = True
                         shop_i_health = "n/a"
                         shop_i_attack = "n/a"
                         shop_i_special = "n/a"
