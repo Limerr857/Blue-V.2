@@ -36,7 +36,12 @@ blacksmith_state = "New"
 sleepy_state = "Normal"
 shop_state = "New"
 level_current = 1
-item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png", "img/item/sword_3.png"]
+item_list = [
+    
+            "img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png", "img/item/sword_3.png",
+            "img/item/shield_3.png"
+            
+            ]
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
@@ -649,7 +654,7 @@ class Knight_1(Object__):
         enemies_group.add(self)
 
 class Knight_3(Object__):
-    speed = 200 # 3.33 seconds
+    speed = 300 # 3.33 seconds
     def __init__(self):
         self.image = img.load(object_list[18])
         self.setup()
@@ -696,6 +701,8 @@ class Item(pygame.sprite.Sprite):
             Shield_2.__init__(self)
         elif type_ == 6:
             Sword_3.__init__(self)
+        elif type_ == 7:
+            Shield_3.__init__(self)
 
 class Sword_1(Item):
     def __init__(self):
@@ -738,6 +745,13 @@ class Sword_3(Item):
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "sword_3"
+
+class Shield_3(Item):
+    def __init__(self):
+        self.image = img.load(item_list[4])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_3"
 
 
 def re_draw():
@@ -1878,8 +1892,8 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[5]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 500
-            battle_enemy_maxhp = 500
+            battle_enemy_hp = 420
+            battle_enemy_maxhp = 420
             battle_enemy_attack = 40
             battle_enemy_gold = 200
 
@@ -2344,14 +2358,14 @@ def updates():
                     if item.type_ == 2:
                         # shield_1
                         shop_i_attack = "n/a"
-                        shop_i_health = "50"
+                        shop_i_health = "150"
                         shop_i_cost = "5"
                         shop_i_special = "None"
                         shop_i_selected = "shield_1"
                         shop_i_name = "Bronze Shield"
                     if item.type_ == 3:
                         # bow_1
-                        shop_i_attack = "10"
+                        shop_i_attack = "15"
                         shop_i_health = "n/a"
                         shop_i_cost = "30"
                         shop_i_special = "None"
@@ -2359,7 +2373,7 @@ def updates():
                         shop_i_name = "Shortbow"
                     if item.type_ == 4:
                         # sword_2
-                        shop_i_attack = "40"
+                        shop_i_attack = "50"
                         shop_i_health = "n/a"
                         shop_i_cost = "50"
                         shop_i_special = "None"
@@ -2368,19 +2382,27 @@ def updates():
                     if item.type_ == 5:
                         # shield_2
                         shop_i_attack = "n/a"
-                        shop_i_health = "150"
+                        shop_i_health = "200"
                         shop_i_cost = "70"
                         shop_i_special = "None"
                         shop_i_selected = "shield_2"
                         shop_i_name = "Iron Shield"
                     if item.type_ == 6:
                         # sword_3
-                        shop_i_attack = "80"
+                        shop_i_attack = "90"
                         shop_i_health = "n/a"
                         shop_i_cost = "100"
                         shop_i_special = "None"
                         shop_i_selected = "sword_3"
                         shop_i_name = "Gold Dagger"
+                    if item.type_ == 7:
+                        # shield_3
+                        shop_i_attack = "n/a"
+                        shop_i_health = "350"
+                        shop_i_cost = "110"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_3"
+                        shop_i_name = "Gold Shield"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:

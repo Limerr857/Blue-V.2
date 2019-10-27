@@ -25,7 +25,7 @@
 "img/Backdrops/Level_1_1.png"
 [[0, 500, 500], [2, 1000, 300], [3, 1070, 600], [5, 30, 50], [4, 100, 400]]
 ["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!", "I'm the blacksmith, here you can buy upgrades for your weapons! [PRESS SPACE]"]
-[1, 2, 3, 4, 5, 6]
+[1, 2, 3, 4, 5, 6, 7]
 
 # slice 2
 "img/Backdrops/Level_1_2.png"
@@ -36,7 +36,7 @@
 "img/Backdrops/Level_1_3.png"
 
 # slice 3 spawns
-[[16, 200], [17, 500]]
+[[16, 300], [17, 500]]
 
 # slice 4
 "img/Backdrops/Level_1_4.png"
@@ -49,7 +49,7 @@
 "img/Backdrops/Level_1_6.png"
 
 # slice 6 spawns
-[[16, 200], [17, 500]]
+[[16, 300], [17, 500]]
 
 # slice 7
 "img/Backdrops/Level_1_7.png"
