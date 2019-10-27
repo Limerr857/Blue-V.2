@@ -51,14 +51,19 @@ battle_effect_1 = 10000
 battle_effect_2 = 10000
 battle_effect_3 = 10000
 battle_effect_4 = 10000
+battle_effect_5 = 10000
+battle_effect_6 = 10000
+battle_effect_7 = 10000
+battle_effect_8 = 10000
 
 battle_unlocked_shot = False
-# HIGLY TEMPORARY!!!!
-battle_unlocked_fire = True
-# not
+battle_unlocked_fire = False
 battle_unlocked_ice = False
-battle_unlocked_heal = False
-battle_unlocked_brave = False
+# HIGLY TEMPORARY!!!!
+battle_unlocked_heal = True
+battle_unlocked_brave = True
+# not
+
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -132,6 +137,7 @@ pause_continue_isselected = img.load("img/pause/continue_isselected.png")
 pause_continue = img.load("img/pause/continue.png")
 
 effect_fire = img.load("img/effect/effect_fire.png")
+effect_ice = img.load("img/effect/effect_ice.png")
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -147,6 +153,7 @@ music_on = True
 music_played = False
 
 sound_fire = pygame.mixer.Sound("sound/effects/fire.wav")
+sound_ice = pygame.mixer.Sound("sound/effects/ice.wav")
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
@@ -663,6 +670,10 @@ def re_draw():
     global battle_effect_2
     global battle_effect_3
     global battle_effect_4
+    global battle_effect_5
+    global battle_effect_6
+    global battle_effect_7
+    global battle_effect_8
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -1101,19 +1112,30 @@ def re_draw():
                 elif battle_anim_time < 50:
                     battle_enemy_x -= 2
                     battle_anim_time += 2
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_1 = random.randint(-15, 95)
+                        battle_effect_2 = random.randint(-15, 95)
+                        battle_effect_3 = random.randint(-15, 95)
+                        battle_effect_4 = random.randint(-15, 95)
                 elif battle_anim_time >= 50 and battle_anim_time <= 100:
                     battle_enemy_x += 2
                     battle_anim_time += 2
                     # Fire effect
-                    temp = random.randint(-5, 105)
-                    temp2 = random.randint(-5, 105)
-                    win.blit(effect_fire, (player_.rect.x + temp, player_.rect.y + temp2))
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_1 = random.randint(-15, 95)
+                        battle_effect_2 = random.randint(-15, 95)
+                        battle_effect_3 = random.randint(-15, 95)
+                        battle_effect_4 = random.randint(-15, 95)
                 elif battle_anim_time > 100:
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
                     temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
                     player_.hp -= battle_enemy_attack + temp
+                    battle_effect_1 = 10000
+                    battle_effect_2 = 10000
+                    battle_effect_3 = 10000
+                    battle_effect_4 = 10000
             elif battle_animation == "p_fire":
                 if battle_anim_time == 0:
                     sound_fire.play()
@@ -1122,10 +1144,11 @@ def re_draw():
                 elif battle_anim_time < 50:
                     player_.rect.x += 2
                     battle_anim_time += 2
-                    battle_effect_1 = 10000
-                    battle_effect_2 = 10000
-                    battle_effect_3 = 10000
-                    battle_effect_4 = 10000
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_1 = random.randint(-15, 95)
+                        battle_effect_2 = random.randint(-15, 95)
+                        battle_effect_3 = random.randint(-15, 95)
+                        battle_effect_4 = random.randint(-15, 95)
                 elif battle_anim_time >= 50 and battle_anim_time <= 100:
                     player_.rect.x -= 2
                     battle_anim_time += 2
@@ -1146,6 +1169,72 @@ def re_draw():
                     battle_effect_3 = 10000
                     battle_effect_4 = 10000
 
+            elif battle_animation == "e_ice":
+                if battle_anim_time == 0:
+                    sound_ice.play()
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 50:
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_5 = random.randint(-15, 95)
+                        battle_effect_6 = random.randint(-15, 95)
+                        battle_effect_7 = random.randint(-15, 95)
+                        battle_effect_8 = random.randint(-15, 95)
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                    battle_enemy_x += 2
+                    battle_anim_time += 2
+                    # Fire effect
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_5 = random.randint(-15, 95)
+                        battle_effect_6 = random.randint(-15, 95)
+                        battle_effect_7 = random.randint(-15, 95)
+                        battle_effect_8 = random.randint(-15, 95)
+                elif battle_anim_time > 100:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    player_.hp -= battle_enemy_attack + temp
+                    battle_effect_5 = 10000
+                    battle_effect_6 = 10000
+                    battle_effect_7 = 10000
+                    battle_effect_8 = 10000
+            elif battle_animation == "p_ice":
+                if battle_anim_time == 0:
+                    sound_ice.play()
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 50:
+                    player_.rect.x += 2
+                    battle_anim_time += 2
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_5 = random.randint(-15, 95)
+                        battle_effect_6 = random.randint(-15, 95)
+                        battle_effect_7 = random.randint(-15, 95)
+                        battle_effect_8 = random.randint(-15, 95)
+                elif battle_anim_time >= 50 and battle_anim_time <= 100:
+                    player_.rect.x -= 2
+                    battle_anim_time += 2
+                    # Fire effect
+                    if battle_anim_time % 10 == 0:
+                        battle_effect_5 = random.randint(-15, 95)
+                        battle_effect_6 = random.randint(-15, 95)
+                        battle_effect_7 = random.randint(-15, 95)
+                        battle_effect_8 = random.randint(-15, 95)
+                elif battle_anim_time > 100:
+                    battle_anim_time = 0
+                    battle_animation = "none"
+                    battle_state = "normal"
+                    temp = random.randint(player_.magic_attack/5*-1, player_.magic_attack/5)
+                    battle_enemy_hp -= player_.magic_attack + temp
+                    battle_effect_5 = 10000
+                    battle_effect_6 = 10000
+                    battle_effect_7 = 10000
+                    battle_effect_8 = 10000
+
+
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
 
@@ -1163,6 +1252,8 @@ def re_draw():
             win.blit(battle_bar_hp, (996, 17))
             win.blit(effect_fire, (battle_enemy_x + battle_effect_1, battle_enemy_y + battle_effect_2))
             win.blit(effect_fire, (battle_enemy_x + battle_effect_3, battle_enemy_y + battle_effect_4))
+            win.blit(effect_ice, (battle_enemy_x + battle_effect_5, battle_enemy_y + battle_effect_6))
+            win.blit(effect_ice, (battle_enemy_x + battle_effect_7, battle_enemy_y + battle_effect_8))
     
 
             # Main animation queue
