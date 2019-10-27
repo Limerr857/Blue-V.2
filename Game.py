@@ -36,7 +36,7 @@ blacksmith_state = "New"
 sleepy_state = "Normal"
 shop_state = "New"
 level_current = 1
-item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png"]
+item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png", "img/item/sword_3.png"]
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
@@ -320,7 +320,7 @@ class Player():
         self.inventory = []
         # Temporary
         self.money = 15
-        self.attack = 999
+        self.attack = 15
         # Not temporary
         self.potion_power = 0
         self.potion_healinv = 0
@@ -347,6 +347,10 @@ class Player():
         global slice_
         global battle_enemy
         global battle_bosses_killed
+        global level_current
+        global came_from
+        global level_size
+        global music_track_1
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
@@ -429,6 +433,38 @@ class Player():
                     if obj.slice_ == slice_:
                         battle_enemy = obj.name
                         state = "Battle_update"
+
+
+        dist = 150
+        for obj in group1.sprites():
+            if obj.type == 21:
+                center1 = obj.rect.center
+                center2 = player_.rect.center
+
+                diff_x = abs(center1[0] - center2[0])
+                diff_y = abs(center1[1] - center2[1])
+                if diff_x**2 + diff_y**2 <= dist**2:
+                    if obj.slice_ == slice_:
+                        # Object is exit, close and on the same slice.
+                        level_current = 2
+                        state = "Explore_update"
+                        # HERE WE GO!
+                        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                        came_from = None
+                        level = lvl_2
+                        leveln = "lvl_2"
+                        slice_ = level.get_startslice(leveln)
+                        pos = level.get_startpos(leveln)
+                        ex_x = pos[0]
+                        ex_y = pos[1]
+                        player_.rect.x = pos[0]
+                        player_.rect.y = pos[1]
+                        level_size = level.get_levelsize(leveln)
+                        if music_on:
+                            pygame.mixer.music.play(-1)
+                        
+
+
 
 player_ = Player()
 
@@ -641,7 +677,6 @@ class Level_exit_1(Object__):
         self.rect = self.image.get_rect()
 
 
-
 class Item(pygame.sprite.Sprite):
     
     def __init__(self, type_, nr):
@@ -659,6 +694,8 @@ class Item(pygame.sprite.Sprite):
             Sword_2.__init__(self)
         elif type_ == 5:
             Shield_2.__init__(self)
+        elif type_ == 6:
+            Sword_3.__init__(self)
 
 class Sword_1(Item):
     def __init__(self):
@@ -694,6 +731,13 @@ class Shield_2(Item):
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_2"
+
+class Sword_3(Item):
+    def __init__(self):
+        self.image = img.load(item_list[3])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "sword_3"
 
 
 def re_draw():
@@ -1214,7 +1258,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time < 100:
                     if player_.brave == False:
                         player_.rect.x += 2
@@ -1224,7 +1268,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time >= 100 and battle_anim_time <= 200:
                     if player_.brave == False:
                         player_.rect.x -= 2
@@ -1234,7 +1278,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x += 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time > 200:
                     battle_anim_time = 0
                     battle_animation = "none"
@@ -1270,7 +1314,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time < 25:
                     if player_.brave == False:
                         player_.rect.x += 2
@@ -1280,7 +1324,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time >= 25 and battle_anim_time <= 50:
                     if player_.brave == False:
                         player_.rect.x -= 2
@@ -1290,7 +1334,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x += 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time > 50:
                     battle_anim_time = 0
                     battle_animation = "none"
@@ -1341,7 +1385,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time < 50:
                     if player_.brave == False:
                         player_.rect.x += 2
@@ -1351,7 +1395,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                     if battle_anim_time % 10 == 0:
                         battle_effect_1 = random.randint(-15, 95)
                         battle_effect_2 = random.randint(-15, 95)
@@ -1366,7 +1410,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x += 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                     # Fire effect
                     if battle_anim_time % 10 == 0:
                         battle_effect_1 = random.randint(-15, 95)
@@ -1428,7 +1472,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                 elif battle_anim_time < 50:
                     if player_.brave == False:
                         player_.rect.x += 2
@@ -1438,7 +1482,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x -= 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                     if battle_anim_time % 10 == 0:
                         battle_effect_5 = random.randint(-15, 95)
                         battle_effect_6 = random.randint(-15, 95)
@@ -1453,7 +1497,7 @@ def re_draw():
                         battle_anim_time += 4
                     if player_.iced == True:
                         player_.rect.x += 1
-                        battle_anim_time -= 2
+                        battle_anim_time += 2
                     # Fire effect
                     if battle_anim_time % 10 == 0:
                         battle_effect_5 = random.randint(-15, 95)
@@ -1810,16 +1854,16 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[2]).convert()
             battle_enemy_x = 1500
             battle_enemy_y = 600
-            battle_enemy_hp = 400
-            battle_enemy_maxhp = 400
+            battle_enemy_hp = 200
+            battle_enemy_maxhp = 200
             battle_enemy_attack = 30
             battle_enemy_gold = 20
         elif battle_enemy == "Demon_1":
             battle_enemy_img = img.load(battle_list[3]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 750
-            battle_enemy_hp = 300
-            battle_enemy_maxhp = 300
+            battle_enemy_hp = 250
+            battle_enemy_maxhp = 250
             battle_enemy_attack = 35
             battle_enemy_gold = 20
         elif battle_enemy == "Knight_1":
@@ -1834,9 +1878,9 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[5]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 1000
-            battle_enemy_maxhp = 1000
-            battle_enemy_attack = 50
+            battle_enemy_hp = 500
+            battle_enemy_maxhp = 500
+            battle_enemy_attack = 40
             battle_enemy_gold = 200
 
         state = "Battle"
@@ -2315,7 +2359,7 @@ def updates():
                         shop_i_name = "Shortbow"
                     if item.type_ == 4:
                         # sword_2
-                        shop_i_attack = "10"
+                        shop_i_attack = "40"
                         shop_i_health = "n/a"
                         shop_i_cost = "50"
                         shop_i_special = "None"
@@ -2329,6 +2373,14 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_2"
                         shop_i_name = "Iron Shield"
+                    if item.type_ == 6:
+                        # sword_3
+                        shop_i_attack = "80"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "100"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_3"
+                        shop_i_name = "Gold Dagger"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:
