@@ -24,7 +24,8 @@ object_list = [
                "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
                "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png", "img/battle/zombie_1.png", 
                "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png",
-               "img/battle/demon_1.png", "img/battle/knight_1.png"
+               "img/battle/demon_1.png", "img/battle/knight_1.png", "img/obj/knight_3.png", "img/obj/tower_1.png",
+               "img/princess_1.png", "img/obj/level_exit_1.png"
 
                ]
 player_width = 100
@@ -39,7 +40,7 @@ item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.pn
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
-                "img/battle/knight_1.png"
+                "img/battle/knight_1.png", "img/battle/knight_3.png"
               
               ]
 battle_state = "normal"
@@ -176,6 +177,8 @@ music_played = False
 sound_fire = pygame.mixer.Sound("sound/effects/fire.wav")
 sound_ice = pygame.mixer.Sound("sound/effects/ice.wav")
 sound_heal = pygame.mixer.Sound("sound/effects/heal.wav")
+sound_slash = pygame.mixer.Sound("sound/effects/slash.wav")
+sound_shot = pygame.mixer.Sound("sound/effects/shot.wav")
 
 objects_group = pygame.sprite.Group()
 NPC_group = pygame.sprite.Group()
@@ -300,6 +303,7 @@ class Level():
             x +=1
             
 lvl_1 = Level()
+lvl_2 = Level()
 
 
 class Player():
@@ -316,11 +320,11 @@ class Player():
         self.inventory = []
         # Temporary
         self.money = 15
-        self.attack = 15
-        self.potion_power = 5
-        self.potion_healinv = 3
-        self.potion_braveinv = 10
+        self.attack = 999
         # Not temporary
+        self.potion_power = 0
+        self.potion_healinv = 0
+        self.potion_braveinv = 0
         self.brave = False
         self.iced = False
         self.ranged_attack = 0
@@ -396,6 +400,13 @@ class Player():
                             txt = roboto_15.render(txt, True, (0, 0, 0))
                             txt_pos_x = obj.rect.topleft[0]-63
                             txt_pos_y = obj.rect.topleft[1]-20
+                    elif obj.type == 20:
+                        # Prinsess fake 1
+                        txt = lvl_1.get_text("lvl_1", slice_)
+                        txt = txt[0]
+                        txt = roboto_15.render(txt, True, (0, 0, 0))
+                        txt_pos_x = 570
+                        txt_pos_y = 1000
                     break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
@@ -403,7 +414,7 @@ class Player():
                 txt_pos_y = 0
 
         
-        dist = 150
+        dist = 200
         for obj in enemies_group.sprites():
             if obj.type not in battle_bosses_killed:
                 center1 = obj.rect.center
@@ -462,6 +473,14 @@ class Object__(pygame.sprite.Sprite):
             Demon_1.__init__(self)
         elif type == 17:
             Knight_1.__init__(self)
+        elif type == 18:
+            Knight_3.__init__(self)
+        elif type == 19:
+            Tower_1.__init__(self)
+        elif type == 20:
+            NPC_princess_1.__init__(self)
+        elif type == 21:
+            Level_exit_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -592,6 +611,35 @@ class Knight_1(Object__):
         self.rect = self.image.get_rect()
         self.name = "Knight_1"
         enemies_group.add(self)
+
+class Knight_3(Object__):
+    speed = 200 # 3.33 seconds
+    def __init__(self):
+        self.image = img.load(object_list[18])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Knight_3"
+        enemies_group.add(self)
+
+class Tower_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[19])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class NPC_princess_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[20])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
+
+class Level_exit_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[21])
+        self.setup()
+        self.rect = self.image.get_rect()
+
 
 
 class Item(pygame.sprite.Sprite):
@@ -731,6 +779,9 @@ def re_draw():
     global battle_effect_e12
     global battle_enemy_brave
     global battle_enemy_iced
+    global battle_queue
+    global music_bplayed
+    global music_track_5
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -817,7 +868,7 @@ def re_draw():
                             x = e
                         elif z == 2:
                             y = e 
-                            string = """if object_{}.type not in battle_bosses_killed: win.blit(object_{}.image, ({}, {}))""".format(nr, nr, x, y)
+                            string = "if object_{}.type not in battle_bosses_killed: win.blit(object_{}.image, ({}, {}))".format(nr, nr, x, y)
                             exec(string)
                         z += 1
                     b += 1
@@ -859,6 +910,12 @@ def re_draw():
                                 exec("objects_group.add(object_{})".format(nr), globals())
                                 exec("object_{}.rect.x = {}".format(nr, x))
                                 exec("object_{}.rect.y = {}".format(nr, y))
+                                exec("object_{}.slice_ = {}".format(nr, slice_))
+                            else:
+                                exec("object_{} = Object__({}, ({}, {}))".format(nr, type_, x, y), globals())
+                                exec("objects_group.add(object_{})".format(nr), globals())
+                                exec("object_{}.rect.x = {}".format(nr, 10000))
+                                exec("object_{}.rect.y = {}".format(nr, 10000))
                                 exec("object_{}.slice_ = {}".format(nr, slice_))
                         z += 1
                     a += 1
@@ -947,9 +1004,6 @@ def re_draw():
             battle_gold_random = 0
             if level_current == 1:
                 win.blit(battle_background_1, [0, 0])
-            if music_played == True:
-                pygame.mixer.music.stop()
-                music_played = False
 
             if battle_enemy_hp <= 0:
                 battle_state = "Won"
@@ -1096,6 +1150,14 @@ def re_draw():
                         battle_queue.append("e_fire")
                 elif battle_enemy == "Knight_1":
                     battle_queue.append("e_slash")
+                elif battle_enemy == "Knight_3":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    elif temp == 6:
+                        battle_queue.append("e_ice")
+                    else:
+                        battle_queue.append("e_shot")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1125,7 +1187,11 @@ def re_draw():
         if battle_state == "anim":
 
             if battle_animation == "e_slash":
-                if battle_anim_time < 100:
+                if battle_anim_time == 0:
+                    sound_slash.play()
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 100:
                     battle_enemy_x -= 2
                     battle_anim_time += 2
                 elif battle_anim_time >= 100 and battle_anim_time <= 200:
@@ -1138,7 +1204,18 @@ def re_draw():
                     temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_slash":
-                if battle_anim_time < 100:
+                if battle_anim_time == 0:
+                    sound_slash.play()
+                    if player_.brave == False:
+                        player_.rect.x += 2
+                        battle_anim_time += 2
+                    elif player_.brave == True:
+                        player_.rect.x += 4
+                        battle_anim_time += 4
+                    if player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time -= 2
+                elif battle_anim_time < 100:
                     if player_.brave == False:
                         player_.rect.x += 2
                         battle_anim_time += 2
@@ -1166,7 +1243,11 @@ def re_draw():
                     battle_enemy_hp -= player_.attack + temp
             
             elif battle_animation == "e_shot":
-                if battle_anim_time < 25:
+                if battle_anim_time == 0:
+                    sound_shot.play()
+                    battle_enemy_x -= 2
+                    battle_anim_time += 2
+                elif battle_anim_time < 25:
                     battle_enemy_x -= 2
                     battle_anim_time += 2
                 elif battle_anim_time >= 25 and battle_anim_time <= 50:
@@ -1179,7 +1260,18 @@ def re_draw():
                     temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_shot":
-                if battle_anim_time < 25:
+                if battle_anim_time == 0:
+                    sound_shot.play()
+                    if player_.brave == False:
+                        player_.rect.x += 2
+                        battle_anim_time += 2
+                    elif player_.brave == True:
+                        player_.rect.x += 4
+                        battle_anim_time += 4
+                    if player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time -= 2
+                elif battle_anim_time < 25:
                     if player_.brave == False:
                         player_.rect.x += 2
                         battle_anim_time += 2
@@ -1478,10 +1570,6 @@ def re_draw():
             if level_current == 1:
                 win.blit(battle_background_1, [0, 0])
             
-            if music_played == True:
-                pygame.mixer.music.stop()
-                music_played = False
-            
             if battle_animation == "p_brave":
                 win.blit(effect_brave, (13, 611))
             elif battle_animation == "e_brave":
@@ -1534,6 +1622,14 @@ def re_draw():
                         battle_queue.append("e_fire")
                 elif battle_enemy == "Knight_1":
                     battle_queue.append("e_slash")
+                elif battle_enemy == "Knight_3":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    elif temp == 6:
+                        battle_queue.append("e_ice")
+                    else:
+                        battle_queue.append("e_shot")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1553,6 +1649,11 @@ def re_draw():
 
 
         if battle_state == "Won":
+            if music_on and music_bplayed == False:
+                pygame.mixer.music.stop()
+                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                pygame.mixer.music.play(-1)
+                music_bplayed = True
             win.blit(battle_won, (0, 0))
             if battle_gold_random == 0:
                 battle_gold_random = random.randint(-1, 3)
@@ -1591,6 +1692,11 @@ def re_draw():
 
 
         if battle_state == "Lost":
+            if music_on and music_bplayed == False:
+                pygame.mixer.music.stop()
+                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                pygame.mixer.music.play(-1)
+                music_bplayed = True
             win.blit(battle_lost, (0, 0))
             if battle_gold_random == 0:
                 battle_gold_random = random.randint(1, 3)
@@ -1619,6 +1725,11 @@ def re_draw():
 
 
         if battle_state == "Retreated":
+            if music_on and music_bplayed == False:
+                pygame.mixer.music.stop()
+                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                pygame.mixer.music.play(-1)
+                music_bplayed = True
             win.blit(battle_retreated, (0, 0))
             if battle_gold_random == 0:
                 battle_gold_random = random.randint(1, 3)
@@ -1677,6 +1788,7 @@ def re_draw():
         player_.brave = False
         player_.iced = False
         battle_queue = []
+        music_bplayed = False
 
         if battle_enemy == "Boss_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
@@ -1718,9 +1830,20 @@ def re_draw():
             battle_enemy_maxhp = 350
             battle_enemy_attack = 30
             battle_enemy_gold = 30
+        elif battle_enemy == "Knight_3":
+            battle_enemy_img = img.load(battle_list[5]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 1000
+            battle_enemy_maxhp = 1000
+            battle_enemy_attack = 50
+            battle_enemy_gold = 200
 
         state = "Battle"
         battle_state = "Start_update"
+        music_track_2 = pygame.mixer.music.load("sound/music/battle.mp3")
+        if music_on:
+            pygame.mixer.music.play(-1)
 
 
     elif state == "Pause":
@@ -1785,6 +1908,7 @@ def re_draw():
                     pause_state = "e_sure"
 
         elif pause_state == "m_sure":
+            music_track_2 = pygame.mixer.music.load("sound/music/menu.mp3")
             win.blit(pause_background, (0, 0))
             win.blit(pause_sure, (0, 0))
 
@@ -1817,6 +1941,7 @@ def re_draw():
                     pause_selected = None
                 if pause_selected == "continue":
                     state = "Title"
+                    music_played = False
                     Title_selected = None
                     time.sleep(0.1)
             
@@ -2001,6 +2126,8 @@ def updates():
         pos = level.get_startpos(leveln)
         ex_x = pos[0]
         ex_y = pos[1]
+        player_.rect.x = pos[0]
+        player_.rect.y = pos[1]
         level_size = level.get_levelsize(leveln)
         if music_on:
             pygame.mixer.music.play(-1)
@@ -2180,9 +2307,9 @@ def updates():
                         shop_i_name = "Bronze Shield"
                     if item.type_ == 3:
                         # bow_1
-                        shop_i_attack = "15"
+                        shop_i_attack = "10"
                         shop_i_health = "n/a"
-                        shop_i_cost = "25"
+                        shop_i_cost = "30"
                         shop_i_special = "None"
                         shop_i_selected = "bow_1"
                         shop_i_name = "Shortbow"

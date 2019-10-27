@@ -64,11 +64,8 @@
 
 # slice 9
 "img/Backdrops/Level_1_9.png"
-
-# slice 9 spawns
-[[16, 200], [17, 500]]
-
-
+[[18, 507, 575], [19, 557, 270], [20, 910, 878], [21, 1172, 880]]
+["Thanks! But the princess is in another castle! Quick, go through this very obvious tunnel entrance to the right of me."]
 
 
 
