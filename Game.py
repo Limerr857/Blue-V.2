@@ -1121,7 +1121,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_slash":
                 if battle_anim_time < 100:
@@ -1148,7 +1148,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.attack/5*-1, player_.attack/5)
+                    temp = random.randint(round(player_.attack/5*-1), round(player_.attack/5))
                     battle_enemy_hp -= player_.attack + temp
             
             elif battle_animation == "e_shot":
@@ -1162,7 +1162,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp
             elif battle_animation == "p_shot":
                 if battle_anim_time < 25:
@@ -1189,7 +1189,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.ranged_attack/5*-1, player_.ranged_attack/5)
+                    temp = random.randint(round(player_.ranged_attack/5*-1), round(player_.ranged_attack/5))
                     battle_enemy_hp -= player_.ranged_attack + temp
             
             elif battle_animation == "e_fire":
@@ -1218,7 +1218,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp
                     battle_effect_e1 = 10000
                     battle_effect_e2 = 10000
@@ -1271,7 +1271,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.magic_attack/5*-1, player_.magic_attack/5)
+                    temp = random.randint(round(player_.magic_attack/5*-1), round(player_.magic_attack/5))
                     battle_enemy_hp -= player_.magic_attack + temp
                     battle_effect_1 = 10000
                     battle_effect_2 = 10000
@@ -1304,7 +1304,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     player_.hp -= battle_enemy_attack + temp / 2
                     battle_effect_e5 = 10000
                     battle_effect_e6 = 10000
@@ -1358,7 +1358,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.magic_attack/5*-1, player_.magic_attack/5)
+                    temp = random.randint(round(player_.magic_attack/5*-1), round(player_.magic_attack/5))
                     battle_enemy_hp -= player_.magic_attack + temp / 2
                     battle_effect_5 = 10000
                     battle_effect_6 = 10000
@@ -1389,7 +1389,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(battle_enemy_attack/5*-1, battle_enemy_attack/5)
+                    temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
                     if battle_enemy_hp + battle_enemy_attack + temp <= battle_enemy_maxhp:
                         battle_enemy_hp += battle_enemy_attack + temp
                     else:
@@ -1421,7 +1421,7 @@ def re_draw():
                     battle_anim_time = 0
                     battle_animation = "none"
                     battle_state = "normal"
-                    temp = random.randint(player_.potion_power/5*-1, player_.potion_power/5)
+                    temp = random.randint(round(player_.potion_power/5*-1), round(player_.potion_power/5))
                     if player_.hp + player_.potion_power + temp <= player_.maxhp:
                         player_.hp += player_.potion_power + temp
                     else:
@@ -1455,7 +1455,6 @@ def re_draw():
                     battle_state = "normal"
                     player_.brave = True
                     player_.potion_braveinv -= 1
-
 
             else:
                 print('"{}" is not recognized as a battle_animation.'.format(battle_animation))
@@ -1673,7 +1672,7 @@ def re_draw():
         elif battle_enemy == "Zombie_1":
             battle_enemy_img = img.load(battle_list[1]).convert_alpha()
             battle_enemy_x = 1800
-            battle_enemy_y = 650
+            battle_enemy_y = 750
             battle_enemy_hp = 100
             battle_enemy_maxhp = 100
             battle_enemy_attack = 15
@@ -1689,7 +1688,7 @@ def re_draw():
         elif battle_enemy == "Demon_1":
             battle_enemy_img = img.load(battle_list[3]).convert()
             battle_enemy_x = 1800
-            battle_enemy_y = 650
+            battle_enemy_y = 750
             battle_enemy_hp = 300
             battle_enemy_maxhp = 300
             battle_enemy_attack = 35
@@ -2066,10 +2065,10 @@ def updates():
                                 if temp1 == 11:
                                     battle_enemy = "Zombie_1"
                                     state = "Battle_update"
+                                elif temp1 == 16:
+                                    battle_enemy = "Demon_1"
+                                    state = "Battle_update"
                         x += 1
-                        
-
-                        
 
             # Collision
             player_.Collide(objects_group)

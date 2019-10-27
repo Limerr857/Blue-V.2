@@ -35,6 +35,9 @@
 # slice 3
 "img/Backdrops/Level_1_3.png"
 
+# slice 3 spawns
+[[16, 200]]
+
 # slice 4
 "img/Backdrops/Level_1_4.png"
 
@@ -44,6 +47,9 @@
 
 # slice 6
 "img/Backdrops/Level_1_6.png"
+
+# slice 6 spawns
+[[16, 200]]
 
 # slice 7
 "img/Backdrops/Level_1_7.png"
@@ -58,6 +64,9 @@
 
 # slice 9
 "img/Backdrops/Level_1_9.png"
+
+# slice 9 spawns
+[[16, 200]]
 
 
 
