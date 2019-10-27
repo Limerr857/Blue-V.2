@@ -1097,12 +1097,14 @@ def re_draw():
                     win.blit(battle_lock, (257, 355))
                 if battle_unlocked_heal == False:
                     win.blit(battle_lock, (1601, 28))
-                if battle_unlocked_brave == False and battle_unlocked_heal == True:
+                if battle_unlocked_brave == False:
                     win.blit(battle_lock, (1601, 137))
                 #if battle_unlocked_placeholder == False:
                     #win.blit(battle_lock, (1601, 28))
                 if battle_potions_healleft == False and battle_unlocked_heal == True:
                     win.blit(battle_lock, (1601, 28))
+                if battle_potions_braveleft == False and battle_unlocked_brave == True:
+                    win.blit(battle_lock, (1601, 137))
 
                 mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
                 if mouse_1:
