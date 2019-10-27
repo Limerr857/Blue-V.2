@@ -1686,7 +1686,7 @@ def re_draw():
             battle_enemy_attack = 30
             battle_enemy_gold = 20
         elif battle_enemy == "Demon_1":
-            battle_enemy_img = img.load(battle_list[3]).convert()
+            battle_enemy_img = img.load(battle_list[3]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 750
             battle_enemy_hp = 300
