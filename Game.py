@@ -24,7 +24,7 @@ object_list = [
                "img/NPC/blacksmith_happy.png", "img/obj/forge_1.png", "img/obj/wall_1.png", "img/obj/wall_2.png", 
                "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png", "img/battle/zombie_1.png", 
                "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png",
-               "img/battle/demon_1.png"
+               "img/battle/demon_1.png", "img/battle/knight_1.png"
 
                ]
 player_width = 100
@@ -36,7 +36,12 @@ sleepy_state = "Normal"
 shop_state = "New"
 level_current = 1
 item_list = ["img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png"]
-battle_list = ["img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png"]
+battle_list = [
+
+                "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
+                "img/battle/knight_1.png"
+              
+              ]
 battle_state = "normal"
 battle_animation = "none"
 battle_anim_time = 0
@@ -76,12 +81,8 @@ battle_effect_e12 = 10000
 battle_unlocked_shot = False
 battle_unlocked_fire = False
 battle_unlocked_ice = False
-# HIGLY TEMPORARY!!!!
-battle_unlocked_heal = True
-battle_unlocked_brave = True
-battle_potions_healleft = True
-# not
-
+battle_unlocked_heal = False
+battle_unlocked_brave = False
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -314,8 +315,8 @@ class Player():
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
         # Temporary
-        self.money = 999
-        self.attack = 50
+        self.money = 15
+        self.attack = 15
         self.potion_power = 5
         self.potion_healinv = 3
         self.potion_braveinv = 10
@@ -459,6 +460,8 @@ class Object__(pygame.sprite.Sprite):
             NPC_sleepy_1.__init__(self)
         elif type == 16:
             Demon_1.__init__(self)
+        elif type == 17:
+            Knight_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -579,6 +582,15 @@ class Demon_1(Object__):
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Demon_1"
+        enemies_group.add(self)
+
+class Knight_1(Object__):
+    speed = 350 # 5.83 seconds
+    def __init__(self):
+        self.image = img.load(object_list[17])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Knight_1"
         enemies_group.add(self)
 
 
@@ -1068,20 +1080,22 @@ def re_draw():
                 battle_time = 0
                 if battle_enemy == "Boss_1":
                     battle_queue.append("e_slash")
-                if battle_enemy == "Zombie_1":
+                elif battle_enemy == "Zombie_1":
                     battle_queue.append("e_slash")
-                if battle_enemy == "Door_1":
+                elif battle_enemy == "Door_1":
                     temp = random.randint(1, 3)
                     if temp == 1 or temp == 2:
                         battle_queue.append("e_slash")
                     elif temp == 3:
                         battle_queue.append("e_shot")
-                if battle_enemy == "Demon_1":
-                    temp = random.randint(1, 10)
-                    if temp < 10:
+                elif battle_enemy == "Demon_1":
+                    temp = random.randint(1, 6)
+                    if temp < 6:
                         battle_queue.append("e_slash")
                     else:
                         battle_queue.append("e_fire")
+                elif battle_enemy == "Knight_1":
+                    battle_queue.append("e_slash")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1504,20 +1518,22 @@ def re_draw():
                 battle_time = 0
                 if battle_enemy == "Boss_1":
                     battle_queue.append("e_slash")
-                if battle_enemy == "Zombie_1":
+                elif battle_enemy == "Zombie_1":
                     battle_queue.append("e_slash")
-                if battle_enemy == "Door_1":
+                elif battle_enemy == "Door_1":
                     temp = random.randint(1, 3)
                     if temp == 1 or temp == 2:
                         battle_queue.append("e_slash")
                     elif temp == 3:
                         battle_queue.append("e_shot")
-                if battle_enemy == "Demon_1":
-                    temp = random.randint(1, 10)
-                    if temp < 10:
+                elif battle_enemy == "Demon_1":
+                    temp = random.randint(1, 6)
+                    if temp < 6:
                         battle_queue.append("e_slash")
                     else:
                         battle_queue.append("e_fire")
+                elif battle_enemy == "Knight_1":
+                    battle_queue.append("e_slash")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1660,6 +1676,7 @@ def re_draw():
         battle_enemy_iced = False
         player_.brave = False
         player_.iced = False
+        battle_queue = []
 
         if battle_enemy == "Boss_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
@@ -1693,6 +1710,14 @@ def re_draw():
             battle_enemy_maxhp = 300
             battle_enemy_attack = 35
             battle_enemy_gold = 20
+        elif battle_enemy == "Knight_1":
+            battle_enemy_img = img.load(battle_list[4]).convert_alpha()
+            battle_enemy_x = 1800
+            battle_enemy_y = 750
+            battle_enemy_hp = 350
+            battle_enemy_maxhp = 350
+            battle_enemy_attack = 30
+            battle_enemy_gold = 30
 
         state = "Battle"
         battle_state = "Start_update"
@@ -2068,6 +2093,9 @@ def updates():
                                 elif temp1 == 16:
                                     battle_enemy = "Demon_1"
                                     state = "Battle_update"
+                                elif temp1 == 17:
+                                    battle_enemy = "Knight_1"
+                                    state = "Battle_update"
                         x += 1
 
             # Collision
@@ -2101,7 +2129,7 @@ def updates():
                                     player_.attack = int(shop_i_attack)
                                 else:
                                     player_.attack += int(shop_i_attack)/3
-                            elif shop_i_selected != "bow_1":
+                            elif shop_i_selected == "bow_1":
                                 if player_.ranged_attack < int(shop_i_attack):
                                     player_.ranged_attack = int(shop_i_attack)
                                 else:
