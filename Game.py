@@ -160,6 +160,8 @@ pause_go_back = img.load("img/pause/go_back.png").convert_alpha()
 pause_go_back_isselected = img.load("img/pause/go_back_isselected.png").convert_alpha()
 pause_continue_isselected = img.load("img/pause/continue_isselected.png").convert_alpha()
 pause_continue = img.load("img/pause/continue.png").convert_alpha()
+pause_reset_pos = img.load("img/pause/reset_pos.png").convert_alpha()
+pause_reset_pos_isselected = img.load("img/pause/reset_pos_isselected.png").convert_alpha()
 
 effect_fire = img.load("img/effect/effect_fire.png").convert_alpha()
 effect_ice = img.load("img/effect/effect_ice.png").convert_alpha()
@@ -1925,6 +1927,9 @@ def re_draw():
             elif x > 728 and x < 1191 and y > 901 and y < 1080:
                 # Mouse over exit game
                 pause_selected = "exit_game"
+            elif x > 0 and x < 446 and y > 998 and y < 1080:
+                # Mouse over reset pos
+                pause_selected = "reset_pos"
             else:
                 pause_selected = None
 
@@ -1934,26 +1939,37 @@ def re_draw():
                 win.blit(pause_main_menu, (0, 389))
                 win.blit(pause_save, (0, 568))
                 win.blit(pause_exit_game, (0, 901))
+                win.blit(pause_reset_pos, (0, 998))
             elif pause_selected == "return":
                 win.blit(pause_return_isselected, (0, 210))
                 win.blit(pause_main_menu, (0, 389))
                 win.blit(pause_save, (0, 568))
                 win.blit(pause_exit_game, (0, 901))
+                win.blit(pause_reset_pos, (0, 998))
             elif pause_selected == "main_menu":
                 win.blit(pause_return, (0, 210))
                 win.blit(pause_main_menu_isselected, (0, 389))
                 win.blit(pause_save, (0, 568))
                 win.blit(pause_exit_game, (0, 901))
+                win.blit(pause_reset_pos, (0, 998))
             elif pause_selected == "save":
                 win.blit(pause_return, (0, 210))
                 win.blit(pause_main_menu, (0, 389))
                 win.blit(pause_save_isselected, (0, 568))
                 win.blit(pause_exit_game, (0, 901))
+                win.blit(pause_reset_pos, (0, 998))
             elif pause_selected == "exit_game":
                 win.blit(pause_return, (0, 210))
                 win.blit(pause_main_menu, (0, 389))
                 win.blit(pause_save, (0, 568))
                 win.blit(pause_exit_game_isselected, (0, 901))
+                win.blit(pause_reset_pos, (0, 998))
+            elif pause_selected == "reset_pos":
+                win.blit(pause_return, (0, 210))
+                win.blit(pause_main_menu, (0, 389))
+                win.blit(pause_save, (0, 568))
+                win.blit(pause_exit_game, (0, 901))
+                win.blit(pause_reset_pos_isselected, (0, 998))
             
             # Check for clicks
             mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
@@ -1966,6 +1982,14 @@ def re_draw():
                     state = "save"
                 elif pause_selected == "exit_game":
                     pause_state = "e_sure"
+                elif pause_selected == "reset_pos":
+                    state = "Explore_update"
+                    pos = level.get_startpos(leveln)
+                    ex_x = pos[0]
+                    ex_y = pos[1]
+                    player_.rect.x = pos[0]
+                    player_.rect.y = pos[1]
+                    slice_ = level.get_startslice(leveln)
 
         elif pause_state == "m_sure":
             music_track_2 = pygame.mixer.music.load("sound/music/menu.mp3")
