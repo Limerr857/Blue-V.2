@@ -22,7 +22,9 @@
 
 # slice 1
 "img/Backdrops/Level_2_1.png"
-[[22, 1877, 0], [27, 1820, 212]]
+[[22, 1877, 0], [27, 1820, 212], [34, 692, 5], [4, 910, 605]]
+["You need more stuff? Well it's your lucky day 'cause I got a lot more in stock! [PRESS SPACE]"]
+[12, 8, 9]
 
 # slice 2
 "img/Backdrops/Level_2_2.png"
@@ -30,7 +32,9 @@
 
 # slice 3
 "img/Backdrops/Level_2_3.png"
-[[24, 1877, 0]]
+[[24, 1877, 0], [35, 692, 216], [36, 910, 716]]
+["Welcome to the potions store! [PRESS SPACE]"]
+[10, 10, 10, 11, 11]
 
 # slice 4
 "img/Backdrops/Level_2_4.png"

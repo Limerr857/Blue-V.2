@@ -27,7 +27,9 @@ object_list = [
                "img/battle/demon_1.png", "img/battle/knight_1.png", "img/obj/knight_3.png", "img/obj/tower_1.png",
                "img/princess_1.png", "img/obj/level_exit_1.png", "img/obj/dark_wall_1.png", "img/obj/dark_wall_2_1.png",
                "img/obj/dark_wall_3.png", "img/obj/dark_wall_4_1.png", "img/obj/demon_2.png", "img/obj/zombie_2.png",
-               "img/obj/dark_wall_2_2.png", "img/obj/dark_wall_4_2.png"
+               "img/obj/dark_wall_2_2.png", "img/obj/dark_wall_4_2.png", "img/obj/tree_3.png", "img/obj/tree_4.png",
+               "img/obj/tree_5.png", "img/obj/tree_6.png", "img/obj/forge_2.png", "img/obj/potion_1.png",
+               "img/NPC/wizard_1.png"
 
                ]
 player_width = 100
@@ -41,7 +43,8 @@ level_current = 1
 item_list = [
     
             "img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png", "img/item/sword_3.png",
-            "img/item/shield_3.png"
+            "img/item/shield_3.png", "img/item/sword_4.png", "img/item/shield_4.png", "img/item/heal_1.png",
+            "img/item/brave_1.png", "img/item/bow_2.png"
             
             ]
 battle_list = [
@@ -263,7 +266,7 @@ class Level():
                 try:
                     return eval(txt)
                 except:
-                    # Prevents a bug from happening, if you get error ""string index out of range" then lenghten this list.
+                    # Prevents a bug from happening, if you get the error ""string index out of range" then lenghten this list.
                     return ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
             elif "# slice {}".format(slice_) in line:
                 found = 1
@@ -372,7 +375,7 @@ class Player():
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                 player_.rect.move_ip(vel*-1, 0)
 
-        dist = 200
+        dist = 250
         for obj in NPC_group.sprites():
             center1 = obj.rect.center
             center2 = player_.rect.center
@@ -395,16 +398,28 @@ class Player():
                     elif obj.type == 4:
                         # Blacksmith
                         if blacksmith_state == "New":
-                            txt = lvl_1.get_text("lvl_1", slice_)
-                            txt = txt[1]
-                            txt = roboto_15.render(txt, True, (0, 0, 0))
-                            txt_pos_x = obj.rect.topleft[0]-63
-                            txt_pos_y = obj.rect.topleft[1]-110
+                            if level_current == 1:
+                                txt = lvl_1.get_text("lvl_1", slice_)
+                                txt = txt[1]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = obj.rect.topleft[0]-63
+                                txt_pos_y = obj.rect.topleft[1]-110
 
-                            keys = pygame.key.get_pressed()
-                            if keys[pygame.K_SPACE]:
-                                # Player wants to enter the store.
-                                state = "Shop_update"
+                                keys = pygame.key.get_pressed()
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to enter the store.
+                                    state = "Shop_update"
+                            elif level_current == 2:
+                                txt = lvl_2.get_text("lvl_2", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = 652
+                                txt_pos_y = 705
+
+                                keys = pygame.key.get_pressed()
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to enter the store.
+                                    state = "Shop_update"
                     elif obj.type == 15:
                         # Sleepy
                         if sleepy_state == "Normal":
@@ -420,6 +435,18 @@ class Player():
                         txt = roboto_15.render(txt, True, (0, 0, 0))
                         txt_pos_x = 570
                         txt_pos_y = 1000
+                    elif obj.type == 36:
+                        # Wizard 1
+                        txt = lvl_2.get_text("lvl_2", slice_)
+                        txt = txt[0]
+                        txt = roboto_15.render(txt, True, (0, 0, 0))
+                        txt_pos_x = 820
+                        txt_pos_y = 910
+
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_SPACE]:
+                            # Player wants to enter the store.
+                            state = "Shop_update"
                     break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
@@ -542,6 +569,20 @@ class Object__(pygame.sprite.Sprite):
             Dark_wall_2_2.__init__(self)
         elif type == 29:
             Dark_wall_4_2.__init__(self)
+        elif type == 30:
+            Tree_3.__init__(self)
+        elif type == 31:
+            Tree_4.__init__(self)
+        elif type == 32:
+            Tree_5.__init__(self)
+        elif type == 33:
+            Tree_6.__init__(self)
+        elif type == 34:
+            Forge_2.__init__(self)
+        elif type == 35:
+            Potion_1.__init__(self)
+        elif type == 36:
+            NPC_wizard_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -755,6 +796,50 @@ class Dark_wall_4_2(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
+class Tree_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[30])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Tree_4(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[31])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Tree_5(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[32])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Tree_6(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[33])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Forge_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[34])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Potion_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[35])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class NPC_wizard_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[36])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
+
+
 
 class Item(pygame.sprite.Sprite):
     
@@ -777,6 +862,17 @@ class Item(pygame.sprite.Sprite):
             Sword_3.__init__(self)
         elif type_ == 7:
             Shield_3.__init__(self)
+        elif type_ == 8:
+            Sword_4.__init__(self)
+        elif type_ == 9:
+            Shield_4.__init__(self)
+        elif type_ == 10:
+            Heal_1.__init__(self)
+        elif type_ == 11:
+            Brave_1.__init__(self)
+        elif type_ == 12:
+            Bow_2.__init__(self)
+
 
 class Sword_1(Item):
     def __init__(self):
@@ -826,6 +922,41 @@ class Shield_3(Item):
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_3"
+
+class Sword_4(Item):
+    def __init__(self):
+        self.image = img.load(item_list[5])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "sword_4"
+
+class Shield_4(Item):
+    def __init__(self):
+        self.image = img.load(item_list[6])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_4"
+
+class Heal_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[7])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "heal_1"
+
+class Brave_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[8])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "brave_1"
+
+class Bow_2(Item):
+    def __init__(self):
+        self.image = img.load(item_list[9])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "bow_2"
 
 
 def re_draw():
@@ -1104,13 +1235,28 @@ def re_draw():
                         exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
                         exec("item_{}.rect.y = {}".format(nr, 114))
                         a += 1
+            elif level_current == 2:
+                inv = lvl_2.get_shopinv("lvl_2", slice_)
+                Items_empty = False
+                if inv == "\n" or inv == None:
+                    Items_empty = True
+                if Items_empty == False:
+                    a = 1
+                    for i in inv:
+                        nr = a
+                        type_ = i
+                        exec("item_{} = Item({}, {})".format(nr, type_, nr), globals())
+                        exec("items_group.add(item_{})".format(nr), globals())
+                        exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
+                        exec("item_{}.rect.y = {}".format(nr, 114))
+                        a += 1
                         
         state = "Shop"
     
 
     elif state == "Shop":
         if shop_state == "New":
-            if level_current == 1:
+            if level_current == 1 or level_current == 2:
                 win.blit(shop_background, (0, 0))
                 if Items_empty == False:
                     x_ = 1
@@ -2227,7 +2373,16 @@ def updates():
     global battle_unlocked_fire
     global battle_unlocked_heal
     global battle_unlocked_ice
-    x, y = pygame.mouse.get_pos()
+    global level_current
+    global leveln
+    global level
+    global slice_
+    global pos
+    global ex_x 
+    global ex_y
+    global level_size
+    global x
+    global y
 
     if state == "Title":
         if music_played == False:
@@ -2462,7 +2617,7 @@ def updates():
                         except:
                             pass
                         try:
-                            if shop_i_selected != "bow_1":
+                            if shop_i_selected != "bow_1" and shop_i_selected != "bow_2":
                                 if player_.attack < int(shop_i_attack):
                                     player_.attack = int(shop_i_attack)
                                 else:
@@ -2472,10 +2627,19 @@ def updates():
                                     player_.ranged_attack = int(shop_i_attack)
                                 else:
                                     player_.ranged_attack += int(shop_i_attack)/3
+                            elif shop_i_selected == "bow_2":
+                                if player_.ranged_attack < int(shop_i_attack):
+                                    player_.ranged_attack = int(shop_i_attack)
+                                else:
+                                    player_.ranged_attack += int(shop_i_attack)/3
                         except:
                             pass
                         if shop_i_selected == "bow_1":
                             battle_unlocked_shot = True
+                        elif shop_i_selected == "heal_1":
+                            player_.potion_healinv += 1
+                        elif shop_i_selected == "brave_1":
+                            player_.potion_braveinv += 1        
                         shop_i_health = "n/a"
                         shop_i_attack = "n/a"
                         shop_i_special = "n/a"
@@ -2556,6 +2720,46 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_3"
                         shop_i_name = "Gold Shield"
+                    if item.type_ == 8:
+                        # sword_4
+                        shop_i_attack = "150"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "200"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_4"
+                        shop_i_name = "Magic Sword"
+                    if item.type_ == 9:
+                        # shield_4
+                        shop_i_attack = "n/a"
+                        shop_i_health = "500"
+                        shop_i_cost = "200"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_4"
+                        shop_i_name = "Magic Shield"
+                    if item.type_ == 10:
+                        # heal_1
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "200"
+                        shop_i_special = "+1 Health Potions"
+                        shop_i_selected = "heal_1"
+                        shop_i_name = "Health Potion"
+                    if item.type_ == 11:
+                        # brave_1
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "200"
+                        shop_i_special = "+1 Brave Potions"
+                        shop_i_selected = "brave_1"
+                        shop_i_name = "Brave Potion"
+                    if item.type_ == 12:
+                        # bow_2
+                        shop_i_attack = "30"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "140"
+                        shop_i_special = "None"
+                        shop_i_selected = "bow_2"
+                        shop_i_name = "Recurve Bow"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:
