@@ -25,7 +25,9 @@ object_list = [
                "img/obj/wall_3.png", "img/obj/wall_4.png", "img/enemy_normal.png", "img/battle/zombie_1.png", 
                "img/obj/tree_1.png", "img/obj/tree_2.png", "img/obj/door_1.png", "img/NPC/sleepy_happy.png",
                "img/battle/demon_1.png", "img/battle/knight_1.png", "img/obj/knight_3.png", "img/obj/tower_1.png",
-               "img/princess_1.png", "img/obj/level_exit_1.png"
+               "img/princess_1.png", "img/obj/level_exit_1.png", "img/obj/dark_wall_1.png", "img/obj/dark_wall_2_1.png",
+               "img/obj/dark_wall_3.png", "img/obj/dark_wall_4_1.png", "img/obj/demon_2.png", "img/obj/zombie_2.png",
+               "img/obj/dark_wall_2_2.png", "img/obj/dark_wall_4_2.png"
 
                ]
 player_width = 100
@@ -45,7 +47,7 @@ item_list = [
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
-                "img/battle/knight_1.png", "img/battle/knight_3.png"
+                "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png"
               
               ]
 battle_state = "normal"
@@ -524,6 +526,22 @@ class Object__(pygame.sprite.Sprite):
             NPC_princess_1.__init__(self)
         elif type == 21:
             Level_exit_1.__init__(self)
+        elif type == 22:
+            Dark_wall_1.__init__(self)
+        elif type == 23:
+            Dark_wall_2_1.__init__(self)
+        elif type == 24:
+            Dark_wall_3.__init__(self)
+        elif type == 25:
+            Dark_wall_4_1.__init__(self)
+        elif type == 26:
+            Demon_2.__init__(self)
+        elif type == 27:
+            Zombie_2.__init__(self)
+        elif type == 28:
+            Dark_wall_2_2.__init__(self)
+        elif type == 29:
+            Dark_wall_4_2.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -680,6 +698,60 @@ class NPC_princess_1(Object__):
 class Level_exit_1(Object__):
     def __init__(self):
         self.image = img.load(object_list[21])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Dark_wall_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[22])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Dark_wall_2_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[23])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Dark_wall_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[24])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Dark_wall_4_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[25])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Demon_2(Object__):
+    speed = 200 # 3.33 seconds
+    def __init__(self):
+        self.image = img.load(object_list[26])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Demon_2"
+        enemies_group.add(self)
+
+class Zombie_2(Object__):
+    speed = 240 # 4 seconds
+    def __init__(self):
+        self.image = img.load(object_list[27])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_2"
+        enemies_group.add(self)
+
+class Dark_wall_2_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[28])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Dark_wall_4_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[29])
         self.setup()
         self.rect = self.image.get_rect()
 
@@ -984,25 +1056,28 @@ def re_draw():
 
 
         # Checks if any object is overlapping player, not perfect but almost works
-        for i in objects_group:
-            if i.rect.colliderect(player_):
-                if came_from == "-x":
-                    slice_ -= 1
-                    prev_failed_key = "right"
-                    state = "Explore_update_again"
-                elif came_from == "x":
-                    slice_ += 1
-                    prev_failed_key = "left"
-                    state = "Explore_update_again"
-                elif came_from == "-y":
-                    slice_ -= level_size[0]
-                    prev_failed_key = "down"
-                    state = "Explore_update_again"
-                elif came_from == "y":
-                    slice_ += level_size[0]
-                    prev_failed_key = "up"
-                    state = "Explore_update_again"
-            break
+
+        # Disabled bc it breaks stuff on level 2
+
+        # for i in objects_group:
+        #     if i.rect.colliderect(player_):
+        #         if came_from == "-x":
+        #             slice_ -= 1
+        #             prev_failed_key = "right"
+        #             state = "Explore_update_again"
+        #         elif came_from == "x":
+        #             slice_ += 1
+        #             prev_failed_key = "left"
+        #             state = "Explore_update_again"
+        #         elif came_from == "-y":
+        #             slice_ -= level_size[0]
+        #             prev_failed_key = "down"
+        #             state = "Explore_update_again"
+        #         elif came_from == "y":
+        #             slice_ += level_size[0]
+        #             prev_failed_key = "up"
+        #             state = "Explore_update_again"
+        #     break
             
         if state != "Explore_update_again":
             state = "Explore"
@@ -1220,6 +1295,22 @@ def re_draw():
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                elif battle_enemy == "Demon_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Zombie_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    elif temp < 8:
+                        battle_queue.append("e_shot")
+                    elif temp == 10:
+                        battle_queue.append("e_brave")
+                    else:
+                        battle_queue.append("e_ice")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1692,6 +1783,22 @@ def re_draw():
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                elif battle_enemy == "Demon_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Zombie_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    elif temp < 8:
+                        battle_queue.append("e_shot")
+                    elif temp == 10:
+                        battle_queue.append("e_brave")
+                    else:
+                        battle_queue.append("e_ice")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1900,6 +2007,23 @@ def re_draw():
             battle_enemy_maxhp = 420
             battle_enemy_attack = 40
             battle_enemy_gold = 200
+        elif battle_enemy == "Zombie_2":
+            battle_enemy_img = img.load(battle_list[6]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 800
+            battle_enemy_maxhp = 800
+            battle_enemy_attack = 120
+            battle_enemy_gold = 500
+        elif battle_enemy == "Demon_2":
+            battle_enemy_img = img.load(battle_list[7]).convert_alpha()
+            battle_enemy_x = 1650
+            battle_enemy_y = 600
+            battle_enemy_hp = 1500
+            battle_enemy_maxhp = 1500
+            battle_enemy_attack = 200
+            battle_enemy_gold = 2000
+        
 
         state = "Battle"
         battle_state = "Start_update"
@@ -2204,8 +2328,11 @@ def updates():
         global music_track_1
         music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
         came_from = None
-        level = lvl_1
-        leveln = "lvl_1"
+        # TODO: REMOVE THESE, temporary!!!!
+        level = lvl_2
+        leveln = "lvl_2"
+        level_current = 2
+        # not
         slice_ = level.get_startslice(leveln)
         pos = level.get_startpos(leveln)
         ex_x = pos[0]

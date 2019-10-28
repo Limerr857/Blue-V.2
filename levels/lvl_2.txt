@@ -2,10 +2,9 @@
 1
 [300, 800]
 # this ^ is formatted like this 
-
-#1 level_size
-#2 start_slice
-#3 start_pos
+# [2, 2] level_size
+# 1 start_slice
+# [300, 800] start_pos
 
 
 
@@ -22,21 +21,20 @@
 
 
 # slice 1
-"img/Backdrops/Level_1_1.png"
-[[0, 500, 500], [2, 1000, 300], [3, 1070, 600], [5, 30, 50], [4, 100, 400]]
-["Hello there! Would you like to go on a pointle... I mean you HAVE to save the princess stuck in the tower!", "I'm the blacksmith, here you can buy upgrades for your weapons! [PRESS SPACE]"]
-[1, 2, 3, 4, 5]
+"img/Backdrops/Level_2_1.png"
+[[22, 1877, 0], [27, 1820, 212]]
 
 # slice 2
-"img/Backdrops/Level_1_2.png"
-[[0, 300, 500], [1, 190, 435], [6, 1709, 0], [7, 1709, 719], [14, 1709, 362], [15, 900, 500]]
-["Huh? Don't forget, south of the town there is a forest with zombies in it, you'll get some gold from each one!"]
+"img/Backdrops/Level_2_2.png"
+[[23, 0, 0], [28, 37, 1037]]
 
 # slice 3
-"img/Backdrops/Level_1_3.png"
+"img/Backdrops/Level_2_3.png"
+[[24, 1877, 0]]
 
 # slice 4
-"img/Backdrops/Level_1_4.png"
+"img/Backdrops/Level_2_4.png"
+[[25, 0, 0], [29, 37, 0]]
 
 
 
