@@ -1,0 +1,54 @@
+[3, 3]
+1
+[300, 800]
+# this ^ is formatted like this 
+
+#1 level_size
+#2 start_slice
+#3 start_pos
+
+
+
+# Format goes like this:
+
+# slice n
+# path to background
+# objects/bosses/npc's [type, x, y]
+# optional text
+# items in shop
+
+# slice n spawns
+# enemies capable of randomly generating [type, 1/chance of generation each frame] [11, 400(1/400 = 0.0025%‬)]
+
+
+# slice 1
+"img/Backdrops/Level_3_1.png"
+
+# slice 2
+"img/Backdrops/Level_3_2.png"
+
+# slice 3
+"img/Backdrops/Level_3_3.png"
+
+# slice 4
+"img/Backdrops/Level_3_4.png"
+
+# slice 5
+"img/Backdrops/Level_3_5.png"
+
+# slice 6
+"img/Backdrops/Level_3_6.png"
+
+# slice 7
+"img/Backdrops/Level_3_7.png"
+
+# slice 8
+"img/Backdrops/Level_3_8.png"
+
+# slice 9
+"img/Backdrops/Level_3_9.png"
+
+
+
+
+

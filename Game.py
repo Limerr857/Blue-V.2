@@ -320,6 +320,7 @@ class Level():
             
 lvl_1 = Level()
 lvl_2 = Level()
+lvl_3 = Level()
 
 
 class Player():
@@ -367,6 +368,10 @@ class Player():
         global came_from
         global level_size
         global music_track_1
+        global level 
+        global leveln 
+        global pos
+
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
             keys = pygame.key.get_pressed()
@@ -381,6 +386,7 @@ class Player():
 
         dist = 250
         for obj in NPC_group.sprites():
+            global slice_
             center1 = obj.rect.center
             center2 = player_.rect.center
 
@@ -391,14 +397,15 @@ class Player():
             if diff_x**2 + diff_y**2 <= dist**2:
                 if obj.slice_ == slice_:
                     if obj.type == 3:
-                        # Tophat
-                        if tophat_state == "Save":
-                            global txt
-                            txt = lvl_1.get_text("lvl_1", slice_)
-                            txt = txt[0]
-                            txt = roboto_15.render(txt, True, (0, 0, 0))
-                            txt_pos_x = obj.rect.topleft[0]-63
-                            txt_pos_y = obj.rect.topleft[1]-100
+                        if level_slice == 1:
+                            # Tophat
+                            if tophat_state == "Save":
+                                global txt
+                                txt = lvl_1.get_text("lvl_1", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = obj.rect.topleft[0]-63
+                                txt_pos_y = obj.rect.topleft[1]-100
                     elif obj.type == 4:
                         # Blacksmith
                         if blacksmith_state == "New":
@@ -425,41 +432,45 @@ class Player():
                                     # Player wants to enter the store.
                                     state = "Shop_update"
                     elif obj.type == 15:
-                        # Sleepy
-                        if sleepy_state == "Normal":
+                        if level_current == 1:
+                            # Sleepy
+                            if sleepy_state == "Normal":
+                                txt = lvl_1.get_text("lvl_1", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = obj.rect.topleft[0]-63
+                                txt_pos_y = obj.rect.topleft[1]-20
+                    elif obj.type == 20:
+                        if level_current == 1:
+                            # Prinsess fake 1
                             txt = lvl_1.get_text("lvl_1", slice_)
                             txt = txt[0]
                             txt = roboto_15.render(txt, True, (0, 0, 0))
-                            txt_pos_x = obj.rect.topleft[0]-63
-                            txt_pos_y = obj.rect.topleft[1]-20
-                    elif obj.type == 20:
-                        # Prinsess fake 1
-                        txt = lvl_1.get_text("lvl_1", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
-                        txt_pos_x = 570
-                        txt_pos_y = 1000
+                            txt_pos_x = 570
+                            txt_pos_y = 1000
                     elif obj.type == 36:
-                        # Wizard 1
-                        txt = lvl_2.get_text("lvl_2", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (255, 255, 255))
-                        txt_pos_x = 820
-                        txt_pos_y = 910
+                        if level_current == 2:
+                            # Wizard 1
+                            txt = lvl_2.get_text("lvl_2", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (255, 255, 255))
+                            txt_pos_x = 820
+                            txt_pos_y = 910
 
-                        keys = pygame.key.get_pressed()
-                        if keys[pygame.K_SPACE]:
-                            # Player wants to enter the store.
-                            state = "Shop_update"
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_SPACE]:
+                                # Player wants to enter the store.
+                                state = "Shop_update"
                     elif obj.type == 45:
-                        # Fake princess 2
-                        txt = lvl_2.get_text("lvl_2", slice_)
-                        txt = txt[0]
-                        txt = roboto_15.render(txt, True, (255, 255, 255))
-                        txt_pos_x = 699
-                        txt_pos_y = 844
+                        if level_current == 2:
+                            # Fake princess 2
+                            txt = lvl_2.get_text("lvl_2", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (255, 255, 255))
+                            txt_pos_x = 699
+                            txt_pos_y = 844
 
-                        keys = pygame.key.get_pressed()
+                            keys = pygame.key.get_pressed()
                     break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
@@ -519,7 +530,7 @@ class Player():
                 diff_y = abs(center1[1] - center2[1])
                 if diff_x**2 + diff_y**2 <= dist**2:
                     if obj.slice_ == slice_:
-                        # Object is exit, pllayer is close and on the same slice.
+                        # Object is exit, player is close and on the same slice.
                         level_current = 3
                         state = "Explore_update"
                         # HERE WE GO!
