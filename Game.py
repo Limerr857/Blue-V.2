@@ -29,7 +29,8 @@ object_list = [
                "img/obj/dark_wall_3.png", "img/obj/dark_wall_4_1.png", "img/obj/demon_2.png", "img/obj/zombie_2.png",
                "img/obj/dark_wall_2_2.png", "img/obj/dark_wall_4_2.png", "img/obj/tree_3.png", "img/obj/tree_4.png",
                "img/obj/tree_5.png", "img/obj/tree_6.png", "img/obj/forge_2.png", "img/obj/potion_1.png",
-               "img/NPC/wizard_1.png"
+               "img/NPC/wizard_1.png", "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png",
+               "img/obj/fireplace_1.png", "img/princess_2.png"
 
                ]
 player_width = 100
@@ -50,7 +51,8 @@ item_list = [
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
-                "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png"
+                "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png",
+                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png"
               
               ]
 battle_state = "normal"
@@ -136,6 +138,8 @@ shop_background.set_alpha(None)
 
 battle_background_1 = img.load("img/battle_1.png").convert()
 battle_background_1.set_alpha(None)
+battle_background_2 = img.load("img/battle_2.png").convert()
+battle_background_2.set_alpha(None)
 battle_menu_1 = img.load("img/battle/battle_menu_1.png").convert_alpha()
 battle_menu_2 = img.load("img/battle/battle_menu_2.png").convert_alpha()
 battle_menu_3 = img.load("img/battle/battle_menu_3.png").convert_alpha()
@@ -331,10 +335,10 @@ class Player():
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
         # Temporary
-        self.money = 15
-        self.attack = 15
+        self.money = 99999
+        self.attack = 9999
         # Not temporary
-        self.potion_power = 0
+        self.potion_power = 100
         self.potion_healinv = 0
         self.potion_braveinv = 0
         self.brave = False
@@ -412,7 +416,7 @@ class Player():
                             elif level_current == 2:
                                 txt = lvl_2.get_text("lvl_2", slice_)
                                 txt = txt[0]
-                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt = roboto_15.render(txt, True, (255, 255, 255))
                                 txt_pos_x = 652
                                 txt_pos_y = 705
 
@@ -439,7 +443,7 @@ class Player():
                         # Wizard 1
                         txt = lvl_2.get_text("lvl_2", slice_)
                         txt = txt[0]
-                        txt = roboto_15.render(txt, True, (0, 0, 0))
+                        txt = roboto_15.render(txt, True, (255, 255, 255))
                         txt_pos_x = 820
                         txt_pos_y = 910
 
@@ -447,6 +451,15 @@ class Player():
                         if keys[pygame.K_SPACE]:
                             # Player wants to enter the store.
                             state = "Shop_update"
+                    elif obj.type == 45:
+                        # Fake princess 2
+                        txt = lvl_2.get_text("lvl_2", slice_)
+                        txt = txt[0]
+                        txt = roboto_15.render(txt, True, (255, 255, 255))
+                        txt_pos_x = 699
+                        txt_pos_y = 844
+
+                        keys = pygame.key.get_pressed()
                     break
             else:
                 txt = roboto_15.render("", False, (0, 0, 0))
@@ -489,6 +502,31 @@ class Player():
                         came_from = None
                         level = lvl_2
                         leveln = "lvl_2"
+                        slice_ = level.get_startslice(leveln)
+                        pos = level.get_startpos(leveln)
+                        ex_x = pos[0]
+                        ex_y = pos[1]
+                        player_.rect.x = pos[0]
+                        player_.rect.y = pos[1]
+                        level_size = level.get_levelsize(leveln)
+                        if music_on:
+                            pygame.mixer.music.play(-1)
+            elif obj.type == 44:
+                center1 = obj.rect.center
+                center2 = player_.rect.center
+
+                diff_x = abs(center1[0] - center2[0])
+                diff_y = abs(center1[1] - center2[1])
+                if diff_x**2 + diff_y**2 <= dist**2:
+                    if obj.slice_ == slice_:
+                        # Object is exit, pllayer is close and on the same slice.
+                        level_current = 3
+                        state = "Explore_update"
+                        # HERE WE GO!
+                        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                        came_from = None
+                        level = lvl_3
+                        leveln = "lvl_3"
                         slice_ = level.get_startslice(leveln)
                         pos = level.get_startpos(leveln)
                         ex_x = pos[0]
@@ -564,7 +602,7 @@ class Object__(pygame.sprite.Sprite):
         elif type == 26:
             Demon_2.__init__(self)
         elif type == 27:
-            Zombie_2.__init__(self)
+            Zombie_2_1.__init__(self)
         elif type == 28:
             Dark_wall_2_2.__init__(self)
         elif type == 29:
@@ -583,6 +621,24 @@ class Object__(pygame.sprite.Sprite):
             Potion_1.__init__(self)
         elif type == 36:
             NPC_wizard_1.__init__(self)
+        elif type == 37:
+            Zombiewizard_1.__init__(self)
+        elif type == 38:
+            Zombiewizard_2.__init__(self)
+        elif type == 39:
+            Zombiewizard_3.__init__(self)
+        elif type == 40:
+            Zombie_2_2.__init__(self)
+        elif type == 41:
+            Zombie_2_3.__init__(self)
+        elif type == 42:
+            Zombie_2_4.__init__(self)
+        elif type == 43:
+            Zombie_2_5.__init__(self)
+        elif type == 44:
+            Fireplace_1.__init__(self)
+        elif type == 45:
+            NPC_princess_2.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -775,13 +831,13 @@ class Demon_2(Object__):
         self.name = "Demon_2"
         enemies_group.add(self)
 
-class Zombie_2(Object__):
+class Zombie_2_1(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
         self.image = img.load(object_list[27])
         self.setup()
         self.rect = self.image.get_rect()
-        self.name = "Zombie_2"
+        self.name = "Zombie_2_1"
         enemies_group.add(self)
 
 class Dark_wall_2_2(Object__):
@@ -839,6 +895,81 @@ class NPC_wizard_1(Object__):
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
+class Zombiewizard_1(Object__):
+    speed = 300 # 5 seconds
+    def __init__(self):
+        self.image = img.load(object_list[37])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombiewizard_1"
+        enemies_group.add(self)
+
+class Zombiewizard_2(Object__):
+    speed = 300 # 5 seconds
+    def __init__(self):
+        self.image = img.load(object_list[38])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombiewizard_2"
+        enemies_group.add(self)
+
+class Zombiewizard_3(Object__):
+    speed = 280
+    def __init__(self):
+        self.image = img.load(object_list[39])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombiewizard_3"
+        enemies_group.add(self)
+
+class Zombie_2_2(Object__):
+    speed = 240 # 4 seconds
+    def __init__(self):
+        self.image = img.load(object_list[27])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_2_1"
+        enemies_group.add(self)
+
+class Zombie_2_3(Object__):
+    speed = 240 # 4 seconds
+    def __init__(self):
+        self.image = img.load(object_list[27])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_2_1"
+        enemies_group.add(self)
+
+class Zombie_2_4(Object__):
+    speed = 240 # 4 seconds
+    def __init__(self):
+        self.image = img.load(object_list[27])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_2_1"
+        enemies_group.add(self)
+
+class Zombie_2_5(Object__):
+    speed = 240 # 4 seconds
+    def __init__(self):
+        self.image = img.load(object_list[27])
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Zombie_2_1"
+        enemies_group.add(self)
+
+class Fireplace_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[40])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class NPC_princess_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[41])
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
 
 
 class Item(pygame.sprite.Sprite):
@@ -872,6 +1003,8 @@ class Item(pygame.sprite.Sprite):
             Brave_1.__init__(self)
         elif type_ == 12:
             Bow_2.__init__(self)
+        elif type_ == 13:
+            Shield_5.__init__(self)
 
 
 class Sword_1(Item):
@@ -957,6 +1090,13 @@ class Bow_2(Item):
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "bow_2"
+
+class Shield_5(Item):
+    def __init__(self):
+        self.image = img.load(item_list[6])
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_5"
 
 
 def re_draw():
@@ -1284,7 +1424,9 @@ def re_draw():
         if battle_state == "normal":
             battle_gold_random = 0
             if level_current == 1:
-                win.blit(battle_background_1, [0, 0])
+                win.blit(battle_background_1, (0, 0))
+            elif level_current == 2:
+                win.blit(battle_background_2, (0, 0))
 
             if battle_enemy_hp <= 0:
                 battle_state = "Won"
@@ -1297,19 +1439,20 @@ def re_draw():
             win.blit(battle_bar_hp, (581, 17))
             win.blit(battle_bar_hp, (996, 17))
 
+            if player_.potion_healinv <= 0:
+                battle_potions_healleft = False
+            else:
+                battle_potions_healleft = True
+
+            if player_.potion_braveinv <= 0:
+                battle_potions_braveleft = False
+            else:
+                battle_potions_braveleft = True
+
             if battle_menu == 1:
                 win.blit(battle_menu_1, (0, 0))
                 win.blit(battle_menu_2, (1344, 0))
                 # TODO LATER: Make stuff "select" when mouse is over like the menu
-                if player_.potion_healinv <= 0:
-                    battle_potions_healleft = False
-                else:
-                    battle_potions_healleft = True
-
-                if player_.potion_braveinv <= 0:
-                    battle_potions_braveleft = False
-                else:
-                    battle_potions_braveleft = True
                 
                 # If button is locked
                 if battle_unlocked_shot == False:
@@ -1447,7 +1590,7 @@ def re_draw():
                         battle_queue.append("e_slash")
                     else:
                         battle_queue.append("e_fire")
-                elif battle_enemy == "Zombie_2":
+                elif battle_enemy == "Zombie_2_1":
                     temp = random.randint(1, 10)
                     if temp < 6:
                         battle_queue.append("e_slash")
@@ -1457,6 +1600,24 @@ def re_draw():
                         battle_queue.append("e_brave")
                     else:
                         battle_queue.append("e_ice")
+                elif battle_enemy == "Zombiewizard_1":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_fire")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Zombiewizard_2":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_ice")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Zombiewizard_3":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_shot")
+                    else:
+                        battle_queue.append("e_brave")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -1505,35 +1666,35 @@ def re_draw():
             elif battle_animation == "p_slash":
                 if battle_anim_time == 0:
                     sound_slash.play()
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time < 100:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time >= 100 and battle_anim_time <= 200:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x -= 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x -= 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x += 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time += 1
                 elif battle_anim_time > 200:
                     battle_anim_time = 0
                     battle_animation = "none"
@@ -1557,39 +1718,39 @@ def re_draw():
                     battle_animation = "none"
                     battle_state = "normal"
                     temp = random.randint(round(battle_enemy_attack/5*-1), round(battle_enemy_attack/5))
-                    player_.hp -= battle_enemy_attack + temp
+                    player_.hp -= battle_enemy_attack/4 + temp
             elif battle_animation == "p_shot":
                 if battle_anim_time == 0:
                     sound_shot.play()
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time < 25:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time >= 25 and battle_anim_time <= 50:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x -= 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x -= 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x += 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time += 1
                 elif battle_anim_time > 50:
                     battle_anim_time = 0
                     battle_animation = "none"
@@ -1632,40 +1793,40 @@ def re_draw():
             elif battle_animation == "p_fire":
                 if battle_anim_time == 0:
                     sound_fire.play()
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time < 50:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                     if battle_anim_time % 10 == 0:
                         battle_effect_1 = random.randint(-15, 95)
                         battle_effect_2 = random.randint(-15, 95)
                         battle_effect_3 = random.randint(-15, 95)
                         battle_effect_4 = random.randint(-15, 95)
                 elif battle_anim_time >= 50 and battle_anim_time <= 100:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x -= 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x -= 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x += 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time += 1
                     # Fire effect
                     if battle_anim_time % 10 == 0:
                         battle_effect_1 = random.randint(-15, 95)
@@ -1719,40 +1880,40 @@ def re_draw():
             elif battle_animation == "p_ice":
                 if battle_anim_time == 0:
                     sound_ice.play()
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                 elif battle_anim_time < 50:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x += 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x += 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x -= 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x += 1
+                        battle_anim_time += 1
                     if battle_anim_time % 10 == 0:
                         battle_effect_5 = random.randint(-15, 95)
                         battle_effect_6 = random.randint(-15, 95)
                         battle_effect_7 = random.randint(-15, 95)
                         battle_effect_8 = random.randint(-15, 95)
                 elif battle_anim_time >= 50 and battle_anim_time <= 100:
-                    if player_.brave == False:
+                    if player_.brave == False and player_.iced == False or player_.brave == True and player_.iced == True:
                         player_.rect.x -= 2
                         battle_anim_time += 2
                     elif player_.brave == True:
                         player_.rect.x -= 4
                         battle_anim_time += 4
-                    if player_.iced == True:
-                        player_.rect.x += 1
-                        battle_anim_time += 2
+                    elif player_.iced == True:
+                        player_.rect.x -= 1
+                        battle_anim_time += 1
                     # Fire effect
                     if battle_anim_time % 10 == 0:
                         battle_effect_5 = random.randint(-15, 95)
@@ -1868,6 +2029,8 @@ def re_draw():
             
             if level_current == 1:
                 win.blit(battle_background_1, [0, 0])
+            if level_current == 2:
+                win.blit(battle_background_2, [0, 0])
             
             if battle_animation == "p_brave":
                 win.blit(effect_brave, (13, 611))
@@ -1935,7 +2098,7 @@ def re_draw():
                         battle_queue.append("e_slash")
                     else:
                         battle_queue.append("e_fire")
-                elif battle_enemy == "Zombie_2":
+                elif battle_enemy == "Zombie_2_1":
                     temp = random.randint(1, 10)
                     if temp < 6:
                         battle_queue.append("e_slash")
@@ -1945,6 +2108,24 @@ def re_draw():
                         battle_queue.append("e_brave")
                     else:
                         battle_queue.append("e_ice")
+                elif battle_enemy == "Zombiewizard_1":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_fire")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Zombiewizard_2":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_ice")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Zombiewizard_3":
+                    temp = random.randint(1, 10)
+                    if temp < 9:
+                        battle_queue.append("e_shot")
+                    else:
+                        battle_queue.append("e_brave")
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -2153,7 +2334,7 @@ def re_draw():
             battle_enemy_maxhp = 420
             battle_enemy_attack = 40
             battle_enemy_gold = 200
-        elif battle_enemy == "Zombie_2":
+        elif battle_enemy == "Zombie_2_1":
             battle_enemy_img = img.load(battle_list[6]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
@@ -2169,7 +2350,31 @@ def re_draw():
             battle_enemy_maxhp = 1500
             battle_enemy_attack = 200
             battle_enemy_gold = 2000
-        
+        elif battle_enemy == "Zombiewizard_1":
+            battle_enemy_img = img.load(battle_list[8]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 500
+            battle_enemy_maxhp = 500
+            battle_enemy_attack = 40
+            battle_enemy_gold = 60
+        elif battle_enemy == "Zombiewizard_2":
+            battle_enemy_img = img.load(battle_list[9]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 500
+            battle_enemy_maxhp = 500
+            battle_enemy_attack = 40
+            battle_enemy_gold = 60
+        elif battle_enemy == "Zombiewizard_3":
+            battle_enemy_img = img.load(battle_list[10]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 650
+            battle_enemy_maxhp = 650
+            battle_enemy_attack = 70
+            battle_enemy_gold = 80
+
 
         state = "Battle"
         battle_state = "Start_update"
@@ -2582,13 +2787,17 @@ def updates():
                             if temp2 == 1:
                                 if temp1 == 11:
                                     battle_enemy = "Zombie_1"
-                                    state = "Battle_update"
                                 elif temp1 == 16:
                                     battle_enemy = "Demon_1"
-                                    state = "Battle_update"
                                 elif temp1 == 17:
                                     battle_enemy = "Knight_1"
-                                    state = "Battle_update"
+                                elif temp1 == 37:
+                                    battle_enemy = "Zombiewizard_1"
+                                elif temp1 == 38:
+                                    battle_enemy = "Zombiewizard_2"
+                                elif temp1 == 39:
+                                    battle_enemy = "Zombiewizard_3"
+                                state = "Battle_update"
                         x += 1
 
             # Collision
@@ -2608,7 +2817,13 @@ def updates():
             if mouse_1 and shop_i_cost != "n/a":
                 if player_.money - int(shop_i_cost) >= 0:
                     if shop_i_selected != "None":
-                        shop_i_bought.append(shop_i_selected)
+                        if shop_i_selected != "heal_1" and shop_i_selected != "brave_1":
+                            shop_i_bought.append(shop_i_selected)
+                        else:
+                            if shop_i_selected == "heal_1":
+                                battle_unlocked_heal = True
+                            elif shop_i_selected == "brave_1":
+                                battle_unlocked_brave = True
                         try:
                             if plater_.maxhp < int(shop_i_health):
                                 player_.maxhp = int(shop_i_health)
@@ -2635,6 +2850,8 @@ def updates():
                         except:
                             pass
                         if shop_i_selected == "bow_1":
+                            battle_unlocked_shot = True
+                        if shop_i_selected == "bow_2":
                             battle_unlocked_shot = True
                         elif shop_i_selected == "heal_1":
                             player_.potion_healinv += 1
@@ -2672,7 +2889,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "sword_1"
                         shop_i_name = "Bronze Sword"
-                    if item.type_ == 2:
+                    elif item.type_ == 2:
                         # shield_1
                         shop_i_attack = "n/a"
                         shop_i_health = "150"
@@ -2680,7 +2897,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_1"
                         shop_i_name = "Bronze Shield"
-                    if item.type_ == 3:
+                    elif item.type_ == 3:
                         # bow_1
                         shop_i_attack = "15"
                         shop_i_health = "n/a"
@@ -2688,7 +2905,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "bow_1"
                         shop_i_name = "Shortbow"
-                    if item.type_ == 4:
+                    elif item.type_ == 4:
                         # sword_2
                         shop_i_attack = "50"
                         shop_i_health = "n/a"
@@ -2696,7 +2913,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "sword_2"
                         shop_i_name = "Iron Sword"
-                    if item.type_ == 5:
+                    elif item.type_ == 5:
                         # shield_2
                         shop_i_attack = "n/a"
                         shop_i_health = "200"
@@ -2704,7 +2921,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_2"
                         shop_i_name = "Iron Shield"
-                    if item.type_ == 6:
+                    elif item.type_ == 6:
                         # sword_3
                         shop_i_attack = "90"
                         shop_i_health = "n/a"
@@ -2712,7 +2929,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "sword_3"
                         shop_i_name = "Gold Dagger"
-                    if item.type_ == 7:
+                    elif item.type_ == 7:
                         # shield_3
                         shop_i_attack = "n/a"
                         shop_i_health = "350"
@@ -2720,7 +2937,7 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_3"
                         shop_i_name = "Gold Shield"
-                    if item.type_ == 8:
+                    elif item.type_ == 8:
                         # sword_4
                         shop_i_attack = "150"
                         shop_i_health = "n/a"
@@ -2728,31 +2945,31 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "sword_4"
                         shop_i_name = "Magic Sword"
-                    if item.type_ == 9:
+                    elif item.type_ == 9:
                         # shield_4
                         shop_i_attack = "n/a"
-                        shop_i_health = "500"
+                        shop_i_health = "600"
                         shop_i_cost = "200"
                         shop_i_special = "None"
                         shop_i_selected = "shield_4"
                         shop_i_name = "Magic Shield"
-                    if item.type_ == 10:
+                    elif item.type_ == 10:
                         # heal_1
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
                         shop_i_cost = "200"
-                        shop_i_special = "+1 Health Potions"
+                        shop_i_special = "Heals you."
                         shop_i_selected = "heal_1"
                         shop_i_name = "Health Potion"
-                    if item.type_ == 11:
+                    elif item.type_ == 11:
                         # brave_1
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
                         shop_i_cost = "200"
-                        shop_i_special = "+1 Brave Potions"
+                        shop_i_special = "Faster attack speed."
                         shop_i_selected = "brave_1"
                         shop_i_name = "Brave Potion"
-                    if item.type_ == 12:
+                    elif item.type_ == 12:
                         # bow_2
                         shop_i_attack = "30"
                         shop_i_health = "n/a"
@@ -2760,6 +2977,14 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "bow_2"
                         shop_i_name = "Recurve Bow"
+                    elif item.type_ == 13:
+                        # shield_5
+                        shop_i_attack = "n/a"
+                        shop_i_health = "800"
+                        shop_i_cost = "300"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_5"
+                        shop_i_name = "Ultra Shield"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:
