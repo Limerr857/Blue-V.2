@@ -30,7 +30,11 @@ object_list = [
                "img/obj/dark_wall_2_2.png", "img/obj/dark_wall_4_2.png", "img/obj/tree_3.png", "img/obj/tree_4.png",
                "img/obj/tree_5.png", "img/obj/tree_6.png", "img/obj/forge_2.png", "img/obj/potion_1.png",
                "img/NPC/wizard_1.png", "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png",
-               "img/obj/fireplace_1.png", "img/princess_2.png"
+               "img/obj/fireplace_1.png", "img/princess_2.png", "img/obj/cactus_1.png", "img/obj/cactus_2.png",
+               "img/obj/cactus_3.png", "img/obj/cactus_4.png", "img/obj/cactus_5.png", "img/obj/cactus_6.png",
+               "img/obj/fireplace_2.png", "img/obj/temple_1_1.png", "img/obj/temple_1_2.png", "img/obj/temple_1_3.png", 
+               "img/obj/temple_1_4.png", "img/obj/temple_1_5.png", "img/obj/temple_1_6.png", "img/obj/temple_1_7.png", 
+               "img/obj/temple_1_8.png", "img/obj/temple_1_9.png"
 
                ]
 player_width = 100
@@ -650,6 +654,38 @@ class Object__(pygame.sprite.Sprite):
             Fireplace_1.__init__(self)
         elif type == 45:
             NPC_princess_2.__init__(self)
+        elif type == 46:
+            Cactus_1.__init__(self)
+        elif type == 47:
+            Cactus_2.__init__(self)
+        elif type == 48:
+            Cactus_3.__init__(self)
+        elif type == 49:
+            Cactus_4.__init__(self)
+        elif type == 50:
+            Cactus_5.__init__(self)
+        elif type == 51:
+            Cactus_6.__init__(self)
+        elif type == 52:
+            Fireplace_2.__init__(self)
+        elif type == 53:
+            Temple_1_1.__init__(self)
+        elif type == 54:
+            Temple_1_2.__init__(self)
+        elif type == 55:
+            Temple_1_3.__init__(self)
+        elif type == 56:
+            Temple_1_4.__init__(self)
+        elif type == 57:
+            Temple_1_5.__init__(self)
+        elif type == 58:
+            Temple_1_6.__init__(self)
+        elif type == 59:
+            Temple_1_7.__init__(self)
+        elif type == 60:
+            Temple_1_8.__init__(self)
+        elif type == 61:
+            Temple_1_9.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -981,6 +1017,102 @@ class NPC_princess_2(Object__):
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
+
+class Cactus_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[42])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Cactus_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[43])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Cactus_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[44])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Cactus_4(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[45])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Cactus_5(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[46])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Cactus_6(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[47])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Fireplace_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[48])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[49])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[50])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[51])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_4(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[52])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_5(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[53])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_6(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[54])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_7(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[55])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_8(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[56])
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_9(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[57])
+        self.setup()
+        self.rect = self.image.get_rect()
 
 
 class Item(pygame.sprite.Sprite):
@@ -2700,9 +2832,9 @@ def updates():
         music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
         came_from = None
         # TODO: REMOVE THESE, temporary!!!!
-        level = lvl_2
-        leveln = "lvl_2"
-        level_current = 2
+        level = lvl_3
+        leveln = "lvl_3"
+        level_current = 3
         # not
         slice_ = level.get_startslice(leveln)
         pos = level.get_startpos(leveln)
