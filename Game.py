@@ -61,7 +61,7 @@ battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
                 "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png",
-                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/battle/sandmonster_1.png", 
+                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/ddddbattle/sandmonster_1.png", 
                 "img/battle/sandmonster_2.png", "img/battle/slime_1.png", "img/battle/slime_2.png", "img/battle/slime_3.png", 
                 "img/battle/slime_4.png", "img/battle/slime_5.png", "img/battle/sandwizard_1.png", "img/battle/YOU_1.png"
               
@@ -107,6 +107,8 @@ battle_unlocked_fire = False
 battle_unlocked_ice = False
 battle_unlocked_heal = False
 battle_unlocked_brave = False
+
+battle_enemy = "Boss_1"
 
 shop_i_cost = "n/a"
 shop_i_health = "n/a"
@@ -410,7 +412,7 @@ class Player():
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                 player_.rect.move_ip(vel*-1, 0)
 
-        dist = 250
+        dist = 300
         for obj in NPC_group.sprites():
             if obj.type not in battle_bosses_killed:
                 global slice_
@@ -588,6 +590,7 @@ class Player():
                     # Check so that the enemy is in the same frame
                     if obj.slice_ == slice_:
                         battle_enemy = obj.name
+                        print(battle_enemy)
                         state = "Battle_update"
 
 
@@ -1627,6 +1630,7 @@ def re_draw():
     global load_selected
     global save_selected
     global slot
+    global music_on
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -2011,9 +2015,9 @@ def re_draw():
             # Main animation queue
             battle_speed = eval("{}.speed".format(battle_enemy))
             if battle_enemy_iced == True:
-                battle_speed /= 2
-            if battle_enemy_brave == True:
                 battle_speed *= 2
+            if battle_enemy_brave == True:
+                battle_speed /= 2
             if battle_time > battle_speed:
                 battle_time = 0
                 if battle_enemy == "Boss_1":
@@ -2554,6 +2558,10 @@ def re_draw():
 
             # Main animation queue
             battle_speed = eval("{}.speed".format(battle_enemy))
+            if battle_enemy_iced == True:
+                battle_speed *= 2
+            if battle_enemy_brave == True:
+                battle_speed /= 2
             if battle_time > battle_speed:
                 battle_time = 0
                 if battle_enemy == "Boss_1":
@@ -2821,6 +2829,7 @@ def re_draw():
         battle_queue = []
         music_bplayed = False
 
+        print("2", battle_enemy)
         if battle_enemy == "Boss_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
             battle_enemy_x = 1800
@@ -2873,17 +2882,17 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[6]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 800
-            battle_enemy_maxhp = 800
-            battle_enemy_attack = 120
+            battle_enemy_hp = 600
+            battle_enemy_maxhp = 600
+            battle_enemy_attack = 80
             battle_enemy_gold = 500
         elif battle_enemy == "Demon_2":
             battle_enemy_img = img.load(battle_list[7]).convert_alpha()
             battle_enemy_x = 1650
             battle_enemy_y = 600
-            battle_enemy_hp = 1500
-            battle_enemy_maxhp = 1500
-            battle_enemy_attack = 200
+            battle_enemy_hp = 800
+            battle_enemy_maxhp = 800
+            battle_enemy_attack = 120
             battle_enemy_gold = 2000
         elif battle_enemy == "Zombiewizard_1":
             battle_enemy_img = img.load(battle_list[8]).convert_alpha()
@@ -2892,7 +2901,7 @@ def re_draw():
             battle_enemy_hp = 500
             battle_enemy_maxhp = 500
             battle_enemy_attack = 40
-            battle_enemy_gold = 60
+            battle_enemy_gold = 100
         elif battle_enemy == "Zombiewizard_2":
             battle_enemy_img = img.load(battle_list[9]).convert_alpha()
             battle_enemy_x = 1700
@@ -2900,7 +2909,7 @@ def re_draw():
             battle_enemy_hp = 500
             battle_enemy_maxhp = 500
             battle_enemy_attack = 40
-            battle_enemy_gold = 60
+            battle_enemy_gold = 100
         elif battle_enemy == "Zombiewizard_3":
             battle_enemy_img = img.load(battle_list[10]).convert_alpha()
             battle_enemy_x = 1700
@@ -2908,7 +2917,7 @@ def re_draw():
             battle_enemy_hp = 650
             battle_enemy_maxhp = 650
             battle_enemy_attack = 70
-            battle_enemy_gold = 80
+            battle_enemy_gold = 120
         elif battle_enemy == "Sandmonster_1":
             battle_enemy_img = img.load(battle_list[11]).convert_alpha()
             battle_enemy_x = 1800
@@ -3134,7 +3143,7 @@ def re_draw():
         win.blit(credits_skip, (1727, 995))
         win.blit(credits_, (0, credits_y))
         credits_y -= 1
-        if credits_y < -10130:
+        if credits_y < -9300:
             state = "Title"
             Title_selected = None
             if music_on == True:
@@ -3160,21 +3169,23 @@ def re_draw():
             with open('saves/save1.pkl', 'wb') as f:
                 pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
-                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
-                ], f)
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
+                battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
+                music_on], f)
         elif slot == 2:
             with open('saves/save2.pkl', 'wb') as f:
                 pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
-                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
-                ], f)
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
+                battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
+                music_on], f)
         elif slot == 3:
             with open('saves/save3.pkl', 'wb') as f:
                 pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
-                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
-                ], f)
-        print("YEEES")
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
+                battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
+                music_on], f)
         state = "Pause_update"
     
 
@@ -3182,14 +3193,24 @@ def re_draw():
         # Getting back the objects:
         if slot == 1:
             with open('saves/save1.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
         elif slot == 2:
             with open('saves/save2.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
         elif slot == 3:
             with open('saves/save3.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
         
+        if music_on:
+            pygame.mixer.music.stop()
+            if level_current == 1:
+                music_track_5 = pygame.mixer.music.load("sound/music/level_1.mp3")
+            elif level_current == 2:
+                music_track_5 = pygame.mixer.music.load("sound/music/level_2.mp3")
+            elif level_current == 3:
+                music_track_5 = pygame.mixer.music.load("sound/music/level_3.mp3")
+            pygame.mixer.music.play(-1)
+
         state = "Explore_update"
 
 
@@ -3572,6 +3593,12 @@ def updates():
                                     battle_enemy = "Zombiewizard_2"
                                 elif temp1 == 39:
                                     battle_enemy = "Zombiewizard_3"
+                                elif temp1 == 62:
+                                    battle_enemy = "Sandmonster_1"
+                                elif temp1 == 62:
+                                    battle_enemy = "Sandmonster_2"
+                                elif temp1 == 64:
+                                    battle_enemy = "Slime_1"
                                 state = "Battle_update"
                         x += 1
 
@@ -3600,7 +3627,7 @@ def updates():
                             elif shop_i_selected == "brave_1":
                                 battle_unlocked_brave = True
                         try:
-                            if plater_.maxhp < int(shop_i_health):
+                            if player_.maxhp < int(shop_i_health):
                                 player_.maxhp = int(shop_i_health)
                             else:
                                 player_.maxhp += int(shop_i_health)/3
@@ -3792,7 +3819,7 @@ def updates():
                         # sword_6
                         shop_i_attack = "400"
                         shop_i_health = "n/a"
-                        shop_i_cost = "600"
+                        shop_i_cost = "1000"
                         shop_i_special = "None"
                         shop_i_selected = "sword_6"
                         shop_i_name = "Cursed Sword"
@@ -3800,7 +3827,7 @@ def updates():
                         # shield_7
                         shop_i_attack = "n/a"
                         shop_i_health = "2000"
-                        shop_i_cost = "1000"
+                        shop_i_cost = "3000"
                         shop_i_special = "None"
                         shop_i_selected = "shield_7"
                         shop_i_name = "Force field"
@@ -3816,7 +3843,7 @@ def updates():
                         # scroll_2
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
-                        shop_i_cost = "300"
+                        shop_i_cost = "600"
                         shop_i_special = "Cast ice on your enemies."
                         shop_i_selected = "scroll_2"
                         shop_i_name = "Scroll of ice"
@@ -3824,7 +3851,7 @@ def updates():
                         # scroll_3
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
-                        shop_i_cost = "400"
+                        shop_i_cost = "500"
                         shop_i_special = "Double your magic."
                         shop_i_selected = "scroll_3"
                         shop_i_name = "Scroll of doubling"
@@ -3832,7 +3859,7 @@ def updates():
                         # scroll_4
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
-                        shop_i_cost = "600"
+                        shop_i_cost = "1000"
                         shop_i_special = "Triple your magic."
                         shop_i_selected = "scroll_4"
                         shop_i_name = "Scroll of tripling"
@@ -3840,7 +3867,7 @@ def updates():
                         # scroll_5
                         shop_i_attack = "n/a"
                         shop_i_health = "n/a"
-                        shop_i_cost = "900"
+                        shop_i_cost = "2000"
                         shop_i_special = "Quadruple your magic."
                         shop_i_selected = "scroll_5"
                         shop_i_name = "Scroll of Quadrupling"
@@ -3860,10 +3887,6 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    # Temporary
-    if keys[pygame.K_LCTRL] and keys[pygame.K_SPACE]:
-        run = False
-
 
     updates()
     re_draw()
