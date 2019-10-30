@@ -33,10 +33,11 @@ object_list = [
                "img/obj/fireplace_1.png", "img/princess_2.png", "img/obj/cactus_1.png", "img/obj/cactus_2.png",
                "img/obj/cactus_3.png", "img/obj/cactus_4.png", "img/obj/cactus_5.png", "img/obj/cactus_6.png",
                "img/obj/fireplace_2.png", "img/obj/temple_1_1.png", "img/obj/temple_1_2.png", "img/obj/temple_1_3.png", 
-               "img/obj/temple_1_4.png", "img/obj/temple_1_5.png", "img/obj/temple_1_6.png", "img/obj/temple_1_7.png", 
+               "img/obj/temple_1_4.png", "img/obj/temple_1_5_1.png", "img/obj/temple_1_6.png", "img/obj/temple_1_7.png", 
                "img/obj/temple_1_8.png", "img/obj/temple_1_9.png", "img/battle/sandmonster_1.png", "img/battle/sandmonster_2.png", 
                "img/battle/slime_1.png", "img/obj/forge_3.png", "img/obj/potion_2.png", "img/obj/magic_1.png",
-               "img/obj/sandwizard_1.png"
+               "img/obj/sandwizard_1.png", "img/NPC/YOU_1.png", "img/obj/temple_1_5_2.png", "img/obj/temple_1_5_3.png", 
+               "img/obj/temple_1_5_4.png", "img/obj/temple_1_5_5.png"
 
                ]
 player_width = 100
@@ -61,7 +62,7 @@ battle_list = [
                 "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png",
                 "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/battle/sandmonster_1.png", 
                 "img/battle/sandmonster_2.png", "img/battle/slime_1.png", "img/battle/slime_2.png", "img/battle/slime_3.png", 
-                "img/battle/slime_4.png", "img/battle/slime_5.png", "img/battle/sandwizard_1.png"
+                "img/battle/slime_4.png", "img/battle/slime_5.png", "img/battle/sandwizard_1.png", "img/battle/YOU_1.png"
               
               ]
 battle_state = "normal"
@@ -397,137 +398,155 @@ class Player():
 
         dist = 250
         for obj in NPC_group.sprites():
-            global slice_
-            center1 = obj.rect.center
-            center2 = player_.rect.center
+            if obj.type not in battle_bosses_killed:
+                global slice_
+                center1 = obj.rect.center
+                center2 = player_.rect.center
 
-            diff_x = abs(center1[0] - center2[0])
-            diff_y = abs(center1[1] - center2[1])
+                diff_x = abs(center1[0] - center2[0])
+                diff_y = abs(center1[1] - center2[1])
 
-            # Pythagorean theorem
-            if diff_x**2 + diff_y**2 <= dist**2:
-                if obj.slice_ == slice_:
-                    if obj.type == 3:
-                        if level_current == 1:
-                            # Tophat
-                            if tophat_state == "Save":
-                                global txt
-                                txt = lvl_1.get_text("lvl_1", slice_)
-                                txt = txt[0]
-                                txt = roboto_15.render(txt, True, (0, 0, 0))
-                                txt_pos_x = obj.rect.topleft[0]-63
-                                txt_pos_y = obj.rect.topleft[1]-100
-                        elif level_current == 3:
-                            # Tophat
-                            if tophat_state == "Save":
-                                txt = lvl_3.get_text("lvl_3", slice_)
-                                txt = txt[0]
-                                txt = roboto_15.render(txt, True, (0, 0, 0))
-                                txt_pos_x = obj.rect.topleft[0]-45
-                                txt_pos_y = obj.rect.topleft[1]-95
-
-                                keys = pygame.key.get_pressed()
-                                if keys[pygame.K_SPACE]:
-                                    # Player wants to enter the store.
-                                    state = "Shop_update"
-                    elif obj.type == 4:
-                        # Blacksmith
-                        if blacksmith_state == "New":
+                # Pythagorean theorem
+                if diff_x**2 + diff_y**2 <= dist**2:
+                    if obj.slice_ == slice_:
+                        if obj.type == 3:
                             if level_current == 1:
-                                txt = lvl_1.get_text("lvl_1", slice_)
-                                txt = txt[1]
-                                txt = roboto_15.render(txt, True, (0, 0, 0))
-                                txt_pos_x = obj.rect.topleft[0]-63
-                                txt_pos_y = obj.rect.topleft[1]-110
+                                # Tophat
+                                if tophat_state == "Save":
+                                    global txt
+                                    txt = lvl_1.get_text("lvl_1", slice_)
+                                    txt = txt[0]
+                                    txt = roboto_15.render(txt, True, (0, 0, 0))
+                                    txt_pos_x = obj.rect.topleft[0]-63
+                                    txt_pos_y = obj.rect.topleft[1]-100
+                            elif level_current == 3:
+                                # Tophat
+                                if tophat_state == "Save":
+                                    txt = lvl_3.get_text("lvl_3", slice_)
+                                    txt = txt[0]
+                                    txt = roboto_15.render(txt, True, (0, 0, 0))
+                                    txt_pos_x = obj.rect.topleft[0]-45
+                                    txt_pos_y = obj.rect.topleft[1]-95
 
-                                keys = pygame.key.get_pressed()
-                                if keys[pygame.K_SPACE]:
-                                    # Player wants to enter the store.
-                                    state = "Shop_update"
-                            elif level_current == 2:
+                                    keys = pygame.key.get_pressed()
+                                    if keys[pygame.K_SPACE]:
+                                        # Player wants to enter the store.
+                                        state = "Shop_update"
+                        elif obj.type == 4:
+                            # Blacksmith
+                            if blacksmith_state == "New":
+                                if level_current == 1:
+                                    txt = lvl_1.get_text("lvl_1", slice_)
+                                    txt = txt[1]
+                                    txt = roboto_15.render(txt, True, (0, 0, 0))
+                                    txt_pos_x = obj.rect.topleft[0]-63
+                                    txt_pos_y = obj.rect.topleft[1]-110
+
+                                    keys = pygame.key.get_pressed()
+                                    if keys[pygame.K_SPACE]:
+                                        # Player wants to enter the store.
+                                        state = "Shop_update"
+                                elif level_current == 2:
+                                    txt = lvl_2.get_text("lvl_2", slice_)
+                                    txt = txt[0]
+                                    txt = roboto_15.render(txt, True, (255, 255, 255))
+                                    txt_pos_x = 652
+                                    txt_pos_y = 705
+
+                                    keys = pygame.key.get_pressed()
+                                    if keys[pygame.K_SPACE]:
+                                        # Player wants to enter the store.
+                                        state = "Shop_update"
+                                elif level_current == 3:
+                                    txt = lvl_3.get_text("lvl_3", slice_)
+                                    txt = txt[0]
+                                    txt = roboto_15.render(txt, True, (0, 0, 0))
+                                    txt_pos_x = 215
+                                    txt_pos_y = 481
+
+                                    keys = pygame.key.get_pressed()
+                                    if keys[pygame.K_SPACE]:
+                                        # Player wants to enter the store.
+                                        state = "Shop_update"
+                        elif obj.type == 15:
+                            if level_current == 1:
+                                # Sleepy
+                                if sleepy_state == "Normal":
+                                    txt = lvl_1.get_text("lvl_1", slice_)
+                                    txt = txt[0]
+                                    txt = roboto_15.render(txt, True, (0, 0, 0))
+                                    txt_pos_x = obj.rect.topleft[0]-63
+                                    txt_pos_y = obj.rect.topleft[1]-20
+                        elif obj.type == 20:
+                            if level_current == 1:
+                                # Prinsess fake 1
+                                txt = lvl_1.get_text("lvl_1", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = 570
+                                txt_pos_y = 1000
+                        elif obj.type == 36:
+                            if level_current == 2:
+                                # Wizard 1
                                 txt = lvl_2.get_text("lvl_2", slice_)
                                 txt = txt[0]
                                 txt = roboto_15.render(txt, True, (255, 255, 255))
-                                txt_pos_x = 652
-                                txt_pos_y = 705
+                                txt_pos_x = 820
+                                txt_pos_y = 910
 
                                 keys = pygame.key.get_pressed()
                                 if keys[pygame.K_SPACE]:
                                     # Player wants to enter the store.
                                     state = "Shop_update"
                             elif level_current == 3:
+                                # Wizard 1
                                 txt = lvl_3.get_text("lvl_3", slice_)
                                 txt = txt[0]
                                 txt = roboto_15.render(txt, True, (0, 0, 0))
-                                txt_pos_x = 215
-                                txt_pos_y = 481
+                                txt_pos_x = 536
+                                txt_pos_y = 374
 
                                 keys = pygame.key.get_pressed()
                                 if keys[pygame.K_SPACE]:
                                     # Player wants to enter the store.
                                     state = "Shop_update"
-                    elif obj.type == 15:
-                        if level_current == 1:
-                            # Sleepy
-                            if sleepy_state == "Normal":
-                                txt = lvl_1.get_text("lvl_1", slice_)
+                        elif obj.type == 45:
+                            if level_current == 2:
+                                # Fake princess 2
+                                txt = lvl_2.get_text("lvl_2", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (255, 255, 255))
+                                txt_pos_x = 699
+                                txt_pos_y = 844
+                        elif obj.type == 69:
+                            if level_current == 3:
+                                # YOU
+                                txt = lvl_3.get_text("lvl_3", slice_)
                                 txt = txt[0]
                                 txt = roboto_15.render(txt, True, (0, 0, 0))
-                                txt_pos_x = obj.rect.topleft[0]-63
-                                txt_pos_y = obj.rect.topleft[1]-20
-                    elif obj.type == 20:
-                        if level_current == 1:
-                            # Prinsess fake 1
-                            txt = lvl_1.get_text("lvl_1", slice_)
-                            txt = txt[0]
-                            txt = roboto_15.render(txt, True, (0, 0, 0))
-                            txt_pos_x = 570
-                            txt_pos_y = 1000
-                    elif obj.type == 36:
-                        if level_current == 2:
-                            # Wizard 1
-                            txt = lvl_2.get_text("lvl_2", slice_)
-                            txt = txt[0]
-                            txt = roboto_15.render(txt, True, (255, 255, 255))
-                            txt_pos_x = 820
-                            txt_pos_y = 910
+                                txt_pos_x = 1047
+                                txt_pos_y = 435
 
-                            keys = pygame.key.get_pressed()
-                            if keys[pygame.K_SPACE]:
-                                # Player wants to enter the store.
-                                state = "Shop_update"
-                        elif level_current == 3:
-                            # Wizard 1
-                            txt = lvl_3.get_text("lvl_3", slice_)
-                            txt = txt[0]
-                            txt = roboto_15.render(txt, True, (0, 0, 0))
-                            txt_pos_x = 536
-                            txt_pos_y = 374
+                                keys = pygame.key.get_pressed()
 
-                            keys = pygame.key.get_pressed()
-                            if keys[pygame.K_SPACE]:
-                                # Player wants to enter the store.
-                                state = "Shop_update"
-                    elif obj.type == 45:
-                        if level_current == 2:
-                            # Fake princess 2
-                            txt = lvl_2.get_text("lvl_2", slice_)
-                            txt = txt[0]
-                            txt = roboto_15.render(txt, True, (255, 255, 255))
-                            txt_pos_x = 699
-                            txt_pos_y = 844
-
-                            keys = pygame.key.get_pressed()
-                    break
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to start the fight
+                                    state = "Battle_update"
+                                    battle_enemy = "YOU"
+                        break
+                else:
+                    txt = roboto_15.render("", False, (0, 0, 0))
+                    txt_pos_x = 0
+                    txt_pos_y = 0
             else:
-                txt = roboto_15.render("", False, (0, 0, 0))
-                txt_pos_x = 0
-                txt_pos_y = 0
+                    txt = roboto_15.render("", False, (0, 0, 0))
+                    txt_pos_x = 0
+                    txt_pos_y = 0
 
         
         dist = 200
         for obj in enemies_group.sprites():
-            if obj.type not in battle_bosses_killed:
+            if obj.type not in battle_bosses_killed and obj.type != 69:
                 center1 = obj.rect.center
                 center2 = player_.rect.center
 
@@ -720,7 +739,7 @@ class Object__(pygame.sprite.Sprite):
         elif type == 56:
             Temple_1_4.__init__(self)
         elif type == 57:
-            Temple_1_5.__init__(self)
+            Temple_1_5_1.__init__(self)
         elif type == 58:
             Temple_1_6.__init__(self)
         elif type == 59:
@@ -743,6 +762,16 @@ class Object__(pygame.sprite.Sprite):
             Magic_1.__init__(self)
         elif type == 68:
             Sandwizard_1.__init__(self)
+        elif type == 69:
+            YOU.__init__(self)
+        elif type == 70:
+            Temple_1_5_2.__init__(self)
+        elif type == 71:
+            Temple_1_5_3.__init__(self)
+        elif type == 72:
+            Temple_1_5_4.__init__(self)
+        elif type == 73:
+            Temple_1_5_5.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -1141,7 +1170,7 @@ class Temple_1_4(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
-class Temple_1_5(Object__):
+class Temple_1_5_1(Object__):
     def __init__(self):
         self.image = img.load(object_list[53]).convert_alpha()
         self.setup()
@@ -1225,6 +1254,38 @@ class Sandwizard_1(Object__):
         self.name = "Sandwizard_1"
         enemies_group.add(self)
 
+class YOU(Object__):
+    speed = 200 # 3.33 seconds
+    def __init__(self):
+        self.image = img.load(object_list[65]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
+        enemies_group.add(self)
+
+class Temple_1_5_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[66]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_5_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[67]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_5_4(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[68]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Temple_1_5_5(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[69]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
 
 
 class Item(pygame.sprite.Sprite):
@@ -1998,7 +2059,9 @@ def re_draw():
                     elif temp < 10:
                         battle_queue.append("e_heal")
                     else:
-                        battle_queue.append("e_brave")    
+                        battle_queue.append("e_brave")
+                elif battle_enemy == "YOU":
+                    battle_queue.append("e_slash") 
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -2537,7 +2600,8 @@ def re_draw():
                         battle_queue.append("e_heal")
                     else:
                         battle_queue.append("e_brave")    
-                
+                elif battle_enemy == "YOU":
+                    battle_queue.append("e_slash") 
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -2835,6 +2899,14 @@ def re_draw():
             battle_enemy_maxhp = 1300
             battle_enemy_attack = 150
             battle_enemy_gold = 500
+        elif battle_enemy == "YOU":
+            battle_enemy_img = img.load(battle_list[19]).convert_alpha()
+            battle_enemy_x = 1800
+            battle_enemy_y = 750
+            battle_enemy_hp = player_.maxhp
+            battle_enemy_maxhp = player_.hp
+            battle_enemy_attack = player_.attack
+            battle_enemy_gold = 999999
 
 
         state = "Battle"

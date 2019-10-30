@@ -44,7 +44,8 @@
 
 # slice 5
 "img/Backdrops/Level_3_5.png"
-[[57, 0, 0]]
+[[57, 0, 0], [70, 42, 0], [71, 1877, 0], [72, 42, 1037], [73, 960, 42], [69, 1003, 490]]
+["Finally we meet! I am your long lost evil twin and now we will have the battle of the century! [PRESS SPACE TO FIGHT]"]
 
 # slice 6
 "img/Backdrops/Level_3_6.png"
