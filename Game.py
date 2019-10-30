@@ -61,7 +61,7 @@ battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
                 "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png",
-                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/ddddbattle/sandmonster_1.png", 
+                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/battle/sandmonster_1.png", 
                 "img/battle/sandmonster_2.png", "img/battle/slime_1.png", "img/battle/slime_2.png", "img/battle/slime_3.png", 
                 "img/battle/slime_4.png", "img/battle/slime_5.png", "img/battle/sandwizard_1.png", "img/battle/YOU_1.png"
               
@@ -204,6 +204,8 @@ load_slot_3 = img.load("img/menu/slot_3.png").convert_alpha()
 load_slot_1_isselected = img.load("img/menu/slot_1_isselected.png").convert_alpha()
 load_slot_2_isselected = img.load("img/menu/slot_2_isselected.png").convert_alpha()
 load_slot_3_isselected = img.load("img/menu/slot_3_isselected.png").convert_alpha()
+load_back = img.load("img/menu/back.png").convert_alpha()
+load_back_isselected = img.load("img/menu/back_isselected.png").convert_alpha()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -565,6 +567,10 @@ class Player():
                                     state = "Credits"
                                     credits_music_played = False
                                     credits_y = 1080
+                        else:
+                            txt = roboto_15.render("", False, (0, 0, 0))
+                            txt_pos_x = 0
+                            txt_pos_y = 0
                         break
                 else:
                     txt = roboto_15.render("", False, (0, 0, 0))
@@ -590,7 +596,6 @@ class Player():
                     # Check so that the enemy is in the same frame
                     if obj.slice_ == slice_:
                         battle_enemy = obj.name
-                        print(battle_enemy)
                         state = "Battle_update"
 
 
@@ -2012,6 +2017,26 @@ def re_draw():
                             # Clicked on the No button
                             battle_menu = 1
 
+            keys = pygame.key.get_pressed()
+            
+            if keys[pygame.K_1]:
+                battle_queue.append("p_slash")
+            elif keys[pygame.K_2]:
+                if battle_unlocked_shot:
+                    battle_queue.append("p_shot")
+            elif keys[pygame.K_3]:
+                if battle_unlocked_fire:
+                    battle_queue.append("p_fire")
+            elif keys[pygame.K_4]:
+                if battle_unlocked_ice:
+                    battle_queue.append("p_ice")
+            elif keys[pygame.K_5]:
+                if battle_unlocked_heal and battle_potions_healleft:
+                    battle_queue.append("p_heal")
+            elif keys[pygame.K_6]:
+                if battle_unlocked_brave and battle_potions_braveleft:
+                    battle_queue.append("p_brave")
+
             # Main animation queue
             battle_speed = eval("{}.speed".format(battle_enemy))
             if battle_enemy_iced == True:
@@ -2046,6 +2071,8 @@ def re_draw():
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Demon_2":
                     temp = random.randint(1, 10)
                     if temp < 6:
@@ -2058,6 +2085,8 @@ def re_draw():
                         battle_queue.append("e_slash")
                     elif temp < 8:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                     elif temp == 10:
                         battle_queue.append("e_brave")
                     else:
@@ -2068,15 +2097,21 @@ def re_draw():
                         battle_queue.append("e_fire")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Zombiewizard_2":
                     temp = random.randint(1, 10)
                     if temp < 9:
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Zombiewizard_3":
                     temp = random.randint(1, 10)
                     if temp < 9:
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                         battle_queue.append("e_shot")
                     else:
                         battle_queue.append("e_brave")
@@ -2590,6 +2625,8 @@ def re_draw():
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Demon_2":
                     temp = random.randint(1, 10)
                     if temp < 6:
@@ -2602,6 +2639,8 @@ def re_draw():
                         battle_queue.append("e_slash")
                     elif temp < 8:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                     elif temp == 10:
                         battle_queue.append("e_brave")
                     else:
@@ -2612,15 +2651,21 @@ def re_draw():
                         battle_queue.append("e_fire")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Zombiewizard_2":
                     temp = random.randint(1, 10)
                     if temp < 9:
                         battle_queue.append("e_ice")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Zombiewizard_3":
                     temp = random.randint(1, 10)
                     if temp < 9:
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                         battle_queue.append("e_shot")
                     else:
                         battle_queue.append("e_brave")
@@ -2829,7 +2874,6 @@ def re_draw():
         battle_queue = []
         music_bplayed = False
 
-        print("2", battle_enemy)
         if battle_enemy == "Boss_1":
             battle_enemy_img = img.load(battle_list[0]).convert_alpha()
             battle_enemy_x = 1800
@@ -2845,7 +2889,7 @@ def re_draw():
             battle_enemy_hp = 100
             battle_enemy_maxhp = 100
             battle_enemy_attack = 15
-            battle_enemy_gold = 10
+            battle_enemy_gold = 15
         elif battle_enemy == "Door_1":
             battle_enemy_img = img.load(battle_list[2]).convert()
             battle_enemy_x = 1500
@@ -2882,18 +2926,18 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[6]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 600
-            battle_enemy_maxhp = 600
-            battle_enemy_attack = 80
-            battle_enemy_gold = 500
+            battle_enemy_hp = 800
+            battle_enemy_maxhp = 800
+            battle_enemy_attack = 130
+            battle_enemy_gold = 250
         elif battle_enemy == "Demon_2":
             battle_enemy_img = img.load(battle_list[7]).convert_alpha()
             battle_enemy_x = 1650
             battle_enemy_y = 600
-            battle_enemy_hp = 800
-            battle_enemy_maxhp = 800
-            battle_enemy_attack = 120
-            battle_enemy_gold = 2000
+            battle_enemy_hp = 1000
+            battle_enemy_maxhp = 1000
+            battle_enemy_attack = 300
+            battle_enemy_gold = 500
         elif battle_enemy == "Zombiewizard_1":
             battle_enemy_img = img.load(battle_list[8]).convert_alpha()
             battle_enemy_x = 1700
@@ -2922,17 +2966,17 @@ def re_draw():
             battle_enemy_img = img.load(battle_list[11]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 750
-            battle_enemy_hp = 800
-            battle_enemy_maxhp = 800
-            battle_enemy_attack = 80
+            battle_enemy_hp = 900
+            battle_enemy_maxhp = 900
+            battle_enemy_attack = 300
             battle_enemy_gold = 200
         elif battle_enemy == "Sandmonster_2":
             battle_enemy_img = img.load(battle_list[12]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 1000
-            battle_enemy_maxhp = 1000
-            battle_enemy_attack = 100
+            battle_enemy_hp = 1300
+            battle_enemy_maxhp = 1300
+            battle_enemy_attack = 300
             battle_enemy_gold = 300
         elif battle_enemy == "Slime_1":
             # Randomizes the skin used
@@ -2942,24 +2986,24 @@ def re_draw():
             battle_enemy_y = 650
             battle_enemy_hp = 1300
             battle_enemy_maxhp = 1300
-            battle_enemy_attack = 150
+            battle_enemy_attack = 240
             battle_enemy_gold = 500
         elif battle_enemy == "Sandwizard_1":
             battle_enemy_img = img.load(battle_list[18]).convert_alpha()
             battle_enemy_x = 1700
             battle_enemy_y = 650
-            battle_enemy_hp = 1300
-            battle_enemy_maxhp = 1300
-            battle_enemy_attack = 150
+            battle_enemy_hp = 2400
+            battle_enemy_maxhp = 2400
+            battle_enemy_attack = 500
             battle_enemy_gold = 500
         elif battle_enemy == "YOU":
             battle_enemy_img = img.load(battle_list[19]).convert_alpha()
             battle_enemy_x = 1800
             battle_enemy_y = 750
-            battle_enemy_hp = player_.maxhp
-            battle_enemy_maxhp = player_.hp
-            battle_enemy_attack = player_.attack
-            battle_enemy_gold = 999999
+            battle_enemy_hp = player_.maxhp * 2
+            battle_enemy_maxhp = player_.hp * 2
+            battle_enemy_attack = player_.attack * 1.5
+            battle_enemy_gold = player_.money * 15
 
 
         state = "Battle"
@@ -3228,6 +3272,10 @@ def re_draw():
             elif load_selected == "slot_3":
                 slot = 3
                 state = "load"
+            elif load_selected == "back":
+                state = "Title"
+                Title_selected = None
+                time.sleep(0.2)
             elif load_selected == None:
                 slot = None
 
@@ -3240,6 +3288,8 @@ def re_draw():
                 load_selected = "slot_2"
             elif y > 564 and y < 718:
                 load_selected = "slot_3"
+            elif 1080 > y > 926:
+                load_selected = "back"
             else:
                 load_selected = None
         else:
@@ -3250,21 +3300,31 @@ def re_draw():
             win.blit(load_slot_1_isselected, (0, 256))
             win.blit(load_slot_2, (0, 410))
             win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
         elif load_selected == "slot_2":
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2_isselected, (0, 410))
             win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
         elif load_selected == "slot_3":
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2, (0, 410))
             win.blit(load_slot_3_isselected, (0, 564))
+            win.blit(load_back, (0, 926))
+        elif load_selected == "back":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+            win.blit(load_back_isselected, (0, 926))
         elif load_selected == None:
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2, (0, 410))
-            win.blit(load_slot_3, (0, 564))   
+            win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
 
 
     elif state == "save_menu":
@@ -3284,6 +3344,9 @@ def re_draw():
                 slot = 3
                 state = "save"
                 time.sleep(0.2)
+            elif save_selected == "back":
+                state = "Pause_update"
+                time.sleep(0.2)
 
         x, y = pygame.mouse.get_pos()
 
@@ -3294,6 +3357,8 @@ def re_draw():
                 save_selected = "slot_2"
             elif y > 564 and y < 718:
                 save_selected = "slot_3"
+            elif 1080 > y > 926:
+                save_selected = "back"
             else:
                 save_selected = None
         else:
@@ -3304,21 +3369,31 @@ def re_draw():
             win.blit(load_slot_1_isselected, (0, 256))
             win.blit(load_slot_2, (0, 410))
             win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
         elif save_selected == "slot_2":
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2_isselected, (0, 410))
             win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
         elif save_selected == "slot_3":
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2, (0, 410))
             win.blit(load_slot_3_isselected, (0, 564))
+            win.blit(load_back, (0, 926))
+        elif save_selected == "back":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+            win.blit(load_back_isselected, (0, 926))
         elif save_selected == None:
             win.blit(load_choose_save, (0, 0))
             win.blit(load_slot_1, (0, 256))
             win.blit(load_slot_2, (0, 410))
             win.blit(load_slot_3, (0, 564))
+            win.blit(load_back, (0, 926))
         
         
 
@@ -3425,16 +3500,16 @@ def updates():
             if Options_selected == "go_back":
                 state = "Title"
                 Options_selected = None
-                time.sleep(0.1)
+                time.sleep(0.2)
             elif Options_selected == "toggle_music":
                 if music_on == True:
                     music_on = False
                     pygame.mixer.music.stop()
-                    time.sleep(0.1)
+                    time.sleep(0.2)
                 else:
                     music_on = True
                     pygame.mixer.music.play(-1)
-                    time.sleep(0.1)
+                    time.sleep(0.2)
 
 
     elif state == "Play":
@@ -3595,7 +3670,7 @@ def updates():
                                     battle_enemy = "Zombiewizard_3"
                                 elif temp1 == 62:
                                     battle_enemy = "Sandmonster_1"
-                                elif temp1 == 62:
+                                elif temp1 == 63:
                                     battle_enemy = "Sandmonster_2"
                                 elif temp1 == 64:
                                     battle_enemy = "Slime_1"

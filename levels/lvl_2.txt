@@ -42,7 +42,7 @@
 # slice 4
 "img/Backdrops/Level_2_4.png"
 [[25, 0, 0], [29, 37, 0], [44, 1545, 383], [45, 860, 744]]
-["Thanks! But the princess is in another castle! Quick, go through this very suspicious fireplace to the right of me."]
+["Thanks! But the princess is in a temple further ahead! Quick, go through this fireplace to the right of me."]
 
 
 
