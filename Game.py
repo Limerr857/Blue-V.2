@@ -34,7 +34,9 @@ object_list = [
                "img/obj/cactus_3.png", "img/obj/cactus_4.png", "img/obj/cactus_5.png", "img/obj/cactus_6.png",
                "img/obj/fireplace_2.png", "img/obj/temple_1_1.png", "img/obj/temple_1_2.png", "img/obj/temple_1_3.png", 
                "img/obj/temple_1_4.png", "img/obj/temple_1_5.png", "img/obj/temple_1_6.png", "img/obj/temple_1_7.png", 
-               "img/obj/temple_1_8.png", "img/obj/temple_1_9.png"
+               "img/obj/temple_1_8.png", "img/obj/temple_1_9.png", "img/battle/sandmonster_1.png", "img/battle/sandmonster_2.png", 
+               "img/battle/slime_1.png", "img/obj/forge_3.png", "img/obj/potion_2.png", "img/obj/magic_1.png",
+               "img/obj/sandwizard_1.png"
 
                ]
 player_width = 100
@@ -49,14 +51,17 @@ item_list = [
     
             "img/item/sword_1.png", "img/item/shield_1.png", "img/item/bow_1.png", "img/item/sword_3.png",
             "img/item/shield_3.png", "img/item/sword_4.png", "img/item/shield_4.png", "img/item/heal_1.png",
-            "img/item/brave_1.png", "img/item/bow_2.png"
+            "img/item/brave_1.png", "img/item/bow_2.png", "img/item/shield_5.png", "img/item/sword_5.png",
+            "img/item/shield_6.png", "img/item/sword_6.png", "img/item/shield_7.png", "img/item/scroll_1.png"
             
             ]
 battle_list = [
 
                 "img/battle/enemy_battle.png", "img/battle/zombie_1.png", "img/battle/battle_door_1.png", "img/battle/demon_1.png",
                 "img/battle/knight_1.png", "img/battle/knight_3.png", "img/battle/zombie_2.png", "img/battle/demon_2.png",
-                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png"
+                "img/battle/zombiewizard_1.png", "img/battle/zombiewizard_2.png", "img/battle/zombiewizard_3.png", "img/battle/sandmonster_1.png", 
+                "img/battle/sandmonster_2.png", "img/battle/slime_1.png", "img/battle/slime_2.png", "img/battle/slime_3.png", 
+                "img/battle/slime_4.png", "img/battle/slime_5.png", "img/battle/sandwizard_1.png"
               
               ]
 battle_state = "normal"
@@ -144,6 +149,8 @@ battle_background_1 = img.load("img/battle_1.png").convert()
 battle_background_1.set_alpha(None)
 battle_background_2 = img.load("img/battle_2.png").convert()
 battle_background_2.set_alpha(None)
+battle_background_3 = img.load("img/battle_3.png").convert()
+battle_background_3.set_alpha(None)
 battle_menu_1 = img.load("img/battle/battle_menu_1.png").convert_alpha()
 battle_menu_2 = img.load("img/battle/battle_menu_2.png").convert_alpha()
 battle_menu_3 = img.load("img/battle/battle_menu_3.png").convert_alpha()
@@ -349,7 +356,7 @@ class Player():
         self.brave = False
         self.iced = False
         self.ranged_attack = 0
-        self.magic_attack = 0
+        self.magic_attack = 30
         self.hp = 100
         self.maxhp = 100
         if True:
@@ -401,7 +408,7 @@ class Player():
             if diff_x**2 + diff_y**2 <= dist**2:
                 if obj.slice_ == slice_:
                     if obj.type == 3:
-                        if level_slice == 1:
+                        if level_current == 1:
                             # Tophat
                             if tophat_state == "Save":
                                 global txt
@@ -410,6 +417,19 @@ class Player():
                                 txt = roboto_15.render(txt, True, (0, 0, 0))
                                 txt_pos_x = obj.rect.topleft[0]-63
                                 txt_pos_y = obj.rect.topleft[1]-100
+                        elif level_current == 3:
+                            # Tophat
+                            if tophat_state == "Save":
+                                txt = lvl_3.get_text("lvl_3", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = obj.rect.topleft[0]-45
+                                txt_pos_y = obj.rect.topleft[1]-95
+
+                                keys = pygame.key.get_pressed()
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to enter the store.
+                                    state = "Shop_update"
                     elif obj.type == 4:
                         # Blacksmith
                         if blacksmith_state == "New":
@@ -430,6 +450,17 @@ class Player():
                                 txt = roboto_15.render(txt, True, (255, 255, 255))
                                 txt_pos_x = 652
                                 txt_pos_y = 705
+
+                                keys = pygame.key.get_pressed()
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to enter the store.
+                                    state = "Shop_update"
+                            elif level_current == 3:
+                                txt = lvl_3.get_text("lvl_3", slice_)
+                                txt = txt[0]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = 215
+                                txt_pos_y = 481
 
                                 keys = pygame.key.get_pressed()
                                 if keys[pygame.K_SPACE]:
@@ -460,6 +491,18 @@ class Player():
                             txt = roboto_15.render(txt, True, (255, 255, 255))
                             txt_pos_x = 820
                             txt_pos_y = 910
+
+                            keys = pygame.key.get_pressed()
+                            if keys[pygame.K_SPACE]:
+                                # Player wants to enter the store.
+                                state = "Shop_update"
+                        elif level_current == 3:
+                            # Wizard 1
+                            txt = lvl_3.get_text("lvl_3", slice_)
+                            txt = txt[0]
+                            txt = roboto_15.render(txt, True, (0, 0, 0))
+                            txt_pos_x = 536
+                            txt_pos_y = 374
 
                             keys = pygame.key.get_pressed()
                             if keys[pygame.K_SPACE]:
@@ -686,6 +729,20 @@ class Object__(pygame.sprite.Sprite):
             Temple_1_8.__init__(self)
         elif type == 61:
             Temple_1_9.__init__(self)
+        elif type == 62:
+            Sandmonster_1.__init__(self)
+        elif type == 63:
+            Sandmonster_2.__init__(self)
+        elif type == 64:
+            Slime_1.__init__(self)
+        elif type == 65:
+            Forge_3.__init__(self)
+        elif type == 66:
+            Potion_2.__init__(self)
+        elif type == 67:
+            Magic_1.__init__(self)
+        elif type == 68:
+            Sandwizard_1.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -693,70 +750,70 @@ class Object__(pygame.sprite.Sprite):
 
 class Rock_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[0])
+        self.image = img.load(object_list[0]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Rock_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[1])
+        self.image = img.load(object_list[1]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class House_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[2])
+        self.image = img.load(object_list[2]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class NPC_tophat_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[3])
+        self.image = img.load(object_list[3]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
 class NPC_blacksmith_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[4])
+        self.image = img.load(object_list[4]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
 class Forge_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[5])
+        self.image = img.load(object_list[5]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Wall_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[6])
+        self.image = img.load(object_list[6]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Wall_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[7])
+        self.image = img.load(object_list[7]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Wall_3(Object__):
     def __init__(self):
-        self.image = img.load(object_list[8])
+        self.image = img.load(object_list[8]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Wall_4(Object__):
     def __init__(self):
-        self.image = img.load(object_list[9])
+        self.image = img.load(object_list[9]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Boss_1(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
-        self.image = img.load(object_list[10])
+        self.image = img.load(object_list[10]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Boss_1"
@@ -765,7 +822,7 @@ class Boss_1(Object__):
 class Zombie_1(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
-        self.image = img.load(object_list[11])
+        self.image = img.load(object_list[11]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_1"
@@ -773,20 +830,20 @@ class Zombie_1(Object__):
 
 class Tree_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[12])
+        self.image = img.load(object_list[12]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Tree_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[13])
+        self.image = img.load(object_list[13]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Door_1(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
-        self.image = img.load(object_list[14])
+        self.image = img.load(object_list[14]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Door_1"
@@ -794,7 +851,7 @@ class Door_1(Object__):
 
 class NPC_sleepy_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[15])
+        self.image = img.load(object_list[15]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
@@ -802,7 +859,7 @@ class NPC_sleepy_1(Object__):
 class Demon_1(Object__):
     speed = 400 # 6.66 seconds
     def __init__(self):
-        self.image = img.load(object_list[16])
+        self.image = img.load(object_list[16]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Demon_1"
@@ -811,7 +868,7 @@ class Demon_1(Object__):
 class Knight_1(Object__):
     speed = 350 # 5.83 seconds
     def __init__(self):
-        self.image = img.load(object_list[17])
+        self.image = img.load(object_list[17]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Knight_1"
@@ -820,7 +877,7 @@ class Knight_1(Object__):
 class Knight_3(Object__):
     speed = 300 # 3.33 seconds
     def __init__(self):
-        self.image = img.load(object_list[18])
+        self.image = img.load(object_list[18]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Knight_3"
@@ -828,51 +885,51 @@ class Knight_3(Object__):
 
 class Tower_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[19])
+        self.image = img.load(object_list[19]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class NPC_princess_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[20])
+        self.image = img.load(object_list[20]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
 class Level_exit_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[21])
+        self.image = img.load(object_list[21]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Dark_wall_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[22])
+        self.image = img.load(object_list[22]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Dark_wall_2_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[23])
+        self.image = img.load(object_list[23]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Dark_wall_3(Object__):
     def __init__(self):
-        self.image = img.load(object_list[24])
+        self.image = img.load(object_list[24]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Dark_wall_4_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[25])
+        self.image = img.load(object_list[25]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Demon_2(Object__):
     speed = 200 # 3.33 seconds
     def __init__(self):
-        self.image = img.load(object_list[26])
+        self.image = img.load(object_list[26]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Demon_2"
@@ -881,7 +938,7 @@ class Demon_2(Object__):
 class Zombie_2_1(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
-        self.image = img.load(object_list[27])
+        self.image = img.load(object_list[27]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_2_1"
@@ -889,55 +946,55 @@ class Zombie_2_1(Object__):
 
 class Dark_wall_2_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[28])
+        self.image = img.load(object_list[28]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Dark_wall_4_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[29])
+        self.image = img.load(object_list[29]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Tree_3(Object__):
     def __init__(self):
-        self.image = img.load(object_list[30])
+        self.image = img.load(object_list[30]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Tree_4(Object__):
     def __init__(self):
-        self.image = img.load(object_list[31])
+        self.image = img.load(object_list[31]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Tree_5(Object__):
     def __init__(self):
-        self.image = img.load(object_list[32])
+        self.image = img.load(object_list[32]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Tree_6(Object__):
     def __init__(self):
-        self.image = img.load(object_list[33])
+        self.image = img.load(object_list[33]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Forge_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[34])
+        self.image = img.load(object_list[34]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Potion_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[35])
+        self.image = img.load(object_list[35]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class NPC_wizard_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[36])
+        self.image = img.load(object_list[36]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
@@ -945,7 +1002,7 @@ class NPC_wizard_1(Object__):
 class Zombiewizard_1(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
-        self.image = img.load(object_list[37])
+        self.image = img.load(object_list[37]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombiewizard_1"
@@ -954,7 +1011,7 @@ class Zombiewizard_1(Object__):
 class Zombiewizard_2(Object__):
     speed = 300 # 5 seconds
     def __init__(self):
-        self.image = img.load(object_list[38])
+        self.image = img.load(object_list[38]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombiewizard_2"
@@ -963,7 +1020,7 @@ class Zombiewizard_2(Object__):
 class Zombiewizard_3(Object__):
     speed = 280
     def __init__(self):
-        self.image = img.load(object_list[39])
+        self.image = img.load(object_list[39]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombiewizard_3"
@@ -972,7 +1029,7 @@ class Zombiewizard_3(Object__):
 class Zombie_2_2(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
-        self.image = img.load(object_list[27])
+        self.image = img.load(object_list[27]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_2_1"
@@ -981,7 +1038,7 @@ class Zombie_2_2(Object__):
 class Zombie_2_3(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
-        self.image = img.load(object_list[27])
+        self.image = img.load(object_list[27]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_2_1"
@@ -990,7 +1047,7 @@ class Zombie_2_3(Object__):
 class Zombie_2_4(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
-        self.image = img.load(object_list[27])
+        self.image = img.load(object_list[27]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_2_1"
@@ -999,7 +1056,7 @@ class Zombie_2_4(Object__):
 class Zombie_2_5(Object__):
     speed = 240 # 4 seconds
     def __init__(self):
-        self.image = img.load(object_list[27])
+        self.image = img.load(object_list[27]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         self.name = "Zombie_2_1"
@@ -1007,112 +1064,167 @@ class Zombie_2_5(Object__):
 
 class Fireplace_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[40])
+        self.image = img.load(object_list[40]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class NPC_princess_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[41])
+        self.image = img.load(object_list[41]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
         NPC_group.add(self)
 
 class Cactus_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[42])
+        self.image = img.load(object_list[42]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Cactus_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[43])
+        self.image = img.load(object_list[43]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Cactus_3(Object__):
     def __init__(self):
-        self.image = img.load(object_list[44])
+        self.image = img.load(object_list[44]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Cactus_4(Object__):
     def __init__(self):
-        self.image = img.load(object_list[45])
+        self.image = img.load(object_list[45]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Cactus_5(Object__):
     def __init__(self):
-        self.image = img.load(object_list[46])
+        self.image = img.load(object_list[46]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Cactus_6(Object__):
     def __init__(self):
-        self.image = img.load(object_list[47])
+        self.image = img.load(object_list[47]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Fireplace_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[48])
+        self.image = img.load(object_list[48]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_1(Object__):
     def __init__(self):
-        self.image = img.load(object_list[49])
+        self.image = img.load(object_list[49]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_2(Object__):
     def __init__(self):
-        self.image = img.load(object_list[50])
+        self.image = img.load(object_list[50]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_3(Object__):
     def __init__(self):
-        self.image = img.load(object_list[51])
+        self.image = img.load(object_list[51]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_4(Object__):
     def __init__(self):
-        self.image = img.load(object_list[52])
+        self.image = img.load(object_list[52]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_5(Object__):
     def __init__(self):
-        self.image = img.load(object_list[53])
+        self.image = img.load(object_list[53]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_6(Object__):
     def __init__(self):
-        self.image = img.load(object_list[54])
+        self.image = img.load(object_list[54]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_7(Object__):
     def __init__(self):
-        self.image = img.load(object_list[55])
+        self.image = img.load(object_list[55]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_8(Object__):
     def __init__(self):
-        self.image = img.load(object_list[56])
+        self.image = img.load(object_list[56]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
 
 class Temple_1_9(Object__):
     def __init__(self):
-        self.image = img.load(object_list[57])
+        self.image = img.load(object_list[57]).convert_alpha()
         self.setup()
         self.rect = self.image.get_rect()
+
+class Sandmonster_1(Object__):
+    speed = 300 
+    def __init__(self):
+        self.image = img.load(object_list[58]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Sandmonster_1"
+        enemies_group.add(self)
+
+class Sandmonster_2(Object__):
+    speed = 400 
+    def __init__(self):
+        self.image = img.load(object_list[59]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Sandmonster_2"
+        enemies_group.add(self)
+
+class Slime_1(Object__):
+    speed = 400 
+    def __init__(self):
+        self.image = img.load(object_list[60]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Slime_1"
+        enemies_group.add(self)
+
+class Forge_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[61]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Potion_2(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[62]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Magic_1(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[63]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+
+class Sandwizard_1(Object__):
+    speed = 300 # 3.33 seconds
+    def __init__(self):
+        self.image = img.load(object_list[64]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        self.name = "Sandwizard_1"
+        enemies_group.add(self)
+
 
 
 class Item(pygame.sprite.Sprite):
@@ -1148,98 +1260,179 @@ class Item(pygame.sprite.Sprite):
             Bow_2.__init__(self)
         elif type_ == 13:
             Shield_5.__init__(self)
+        elif type_ == 14:
+            Sword_5.__init__(self)
+        elif type_ == 15:
+            Shield_6.__init__(self)
+        elif type_ == 16:
+            Sword_6.__init__(self)
+        elif type_ == 17:
+            Shield_7.__init__(self)
+        elif type_ == 18:
+            Scroll_1.__init__(self)
+        elif type_ == 19:
+            Scroll_2.__init__(self)
+        elif type_ == 20:
+            Scroll_3.__init__(self)
+        elif type_ == 21:
+            Scroll_4.__init__(self)
+        elif type_ == 22:
+            Scroll_5.__init__(self)
 
 
 class Sword_1(Item):
     def __init__(self):
-        self.image = img.load(item_list[0])
+        self.image = img.load(item_list[0]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "sword_1"
 
 class Shield_1(Item):
     def __init__(self):
-        self.image = img.load(item_list[1])
+        self.image = img.load(item_list[1]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_1"
 
 class Bow_1(Item):
     def __init__(self):
-        self.image = img.load(item_list[2])
+        self.image = img.load(item_list[2]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "bow_1"
     
 class Sword_2(Item):
     def __init__(self):
-        self.image = img.load(item_list[0])
+        self.image = img.load(item_list[0]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "sword_2"
 
 class Shield_2(Item):
     def __init__(self):
-        self.image = img.load(item_list[1])
+        self.image = img.load(item_list[1]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_2"
 
 class Sword_3(Item):
     def __init__(self):
-        self.image = img.load(item_list[3])
+        self.image = img.load(item_list[3]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "sword_3"
 
 class Shield_3(Item):
     def __init__(self):
-        self.image = img.load(item_list[4])
+        self.image = img.load(item_list[4]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_3"
 
 class Sword_4(Item):
     def __init__(self):
-        self.image = img.load(item_list[5])
+        self.image = img.load(item_list[5]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "sword_4"
 
 class Shield_4(Item):
     def __init__(self):
-        self.image = img.load(item_list[6])
+        self.image = img.load(item_list[6]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_4"
 
 class Heal_1(Item):
     def __init__(self):
-        self.image = img.load(item_list[7])
+        self.image = img.load(item_list[7]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "heal_1"
 
 class Brave_1(Item):
     def __init__(self):
-        self.image = img.load(item_list[8])
+        self.image = img.load(item_list[8]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "brave_1"
 
 class Bow_2(Item):
     def __init__(self):
-        self.image = img.load(item_list[9])
+        self.image = img.load(item_list[9]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "bow_2"
 
 class Shield_5(Item):
     def __init__(self):
-        self.image = img.load(item_list[6])
+        self.image = img.load(item_list[10]).convert_alpha()
         self.rect = self.image.get_rect()
         self.size = self.rect.size
         self.name = "shield_5"
+
+class Sword_5(Item):
+    def __init__(self):
+        self.image = img.load(item_list[11]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "sword_5"
+
+class Shield_6(Item):
+    def __init__(self):
+        self.image = img.load(item_list[12]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_6"
+
+class Sword_6(Item):
+    def __init__(self):
+        self.image = img.load(item_list[13]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "sword_6"
+
+class Shield_7(Item):
+    def __init__(self):
+        self.image = img.load(item_list[14]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "shield_7"
+
+class Scroll_1(Item):
+    def __init__(self):
+        self.image = img.load(item_list[15]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "scroll_1"
+
+class Scroll_2(Item):
+    def __init__(self):
+        self.image = img.load(item_list[15]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "scroll_2"
+
+class Scroll_3(Item):
+    def __init__(self):
+        self.image = img.load(item_list[15]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "scroll_3"
+
+class Scroll_4(Item):
+    def __init__(self):
+        self.image = img.load(item_list[15]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "scroll_4"
+
+class Scroll_5(Item):
+    def __init__(self):
+        self.image = img.load(item_list[15]).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.size = self.rect.size
+        self.name = "scroll_5"
 
 
 def re_draw():
@@ -1328,6 +1521,7 @@ def re_draw():
     global battle_queue
     global music_bplayed
     global music_track_5
+    global Items_empty
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -1533,13 +1727,28 @@ def re_draw():
                         exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
                         exec("item_{}.rect.y = {}".format(nr, 114))
                         a += 1
+            elif level_current == 3:
+                inv = lvl_3.get_shopinv("lvl_3", slice_)
+                Items_empty = False
+                if inv == "\n" or inv == None:
+                    Items_empty = True
+                if Items_empty == False:
+                    a = 1
+                    for i in inv:
+                        nr = a
+                        type_ = i
+                        exec("item_{} = Item({}, {})".format(nr, type_, nr), globals())
+                        exec("items_group.add(item_{})".format(nr), globals())
+                        exec("item_{}.rect.x = {}".format(nr, (-57 + 114 * nr)))
+                        exec("item_{}.rect.y = {}".format(nr, 114))
+                        a += 1
                         
         state = "Shop"
     
 
     elif state == "Shop":
         if shop_state == "New":
-            if level_current == 1 or level_current == 2:
+            if level_current == 1 or level_current == 2 or level_current == 3:
                 win.blit(shop_background, (0, 0))
                 if Items_empty == False:
                     x_ = 1
@@ -1570,7 +1779,8 @@ def re_draw():
                 win.blit(battle_background_1, (0, 0))
             elif level_current == 2:
                 win.blit(battle_background_2, (0, 0))
-
+            elif level_current == 3:
+                win.blit(battle_background_3, (0, 0))
             if battle_enemy_hp <= 0:
                 battle_state = "Won"
             elif player_.hp <= 0:
@@ -1761,6 +1971,34 @@ def re_draw():
                         battle_queue.append("e_shot")
                     else:
                         battle_queue.append("e_brave")
+                elif battle_enemy == "Sandmonster_1":
+                    temp = random.randint(1, 10)
+                    if temp < 7:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Sandmonster_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Slime_1":
+                    temp = random.randint(1, 10)
+                    if temp < 10:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Sandwizard_1":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_fire")
+                    elif temp < 8:
+                        battle_queue.append("e_ice")
+                    elif temp < 10:
+                        battle_queue.append("e_heal")
+                    else:
+                        battle_queue.append("e_brave")    
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -2174,6 +2412,8 @@ def re_draw():
                 win.blit(battle_background_1, [0, 0])
             if level_current == 2:
                 win.blit(battle_background_2, [0, 0])
+            elif level_current == 3:
+                win.blit(battle_background_3, (0, 0))
             
             if battle_animation == "p_brave":
                 win.blit(effect_brave, (13, 611))
@@ -2269,6 +2509,35 @@ def re_draw():
                         battle_queue.append("e_shot")
                     else:
                         battle_queue.append("e_brave")
+                elif battle_enemy == "Sandmonster_1":
+                    temp = random.randint(1, 10)
+                    if temp < 7:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Sandmonster_2":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_fire")
+                elif battle_enemy == "Slime_1":
+                    temp = random.randint(1, 10)
+                    if temp < 10:
+                        battle_queue.append("e_slash")
+                    else:
+                        battle_queue.append("e_shot")
+                elif battle_enemy == "Sandwizard_1":
+                    temp = random.randint(1, 10)
+                    if temp < 6:
+                        battle_queue.append("e_fire")
+                    elif temp < 8:
+                        battle_queue.append("e_ice")
+                    elif temp < 10:
+                        battle_queue.append("e_heal")
+                    else:
+                        battle_queue.append("e_brave")    
+                
             elif battle_time <= battle_speed:
                 battle_time += 1
             else:
@@ -2517,6 +2786,40 @@ def re_draw():
             battle_enemy_maxhp = 650
             battle_enemy_attack = 70
             battle_enemy_gold = 80
+        elif battle_enemy == "Sandmonster_1":
+            battle_enemy_img = img.load(battle_list[11]).convert_alpha()
+            battle_enemy_x = 1800
+            battle_enemy_y = 750
+            battle_enemy_hp = 800
+            battle_enemy_maxhp = 800
+            battle_enemy_attack = 80
+            battle_enemy_gold = 200
+        elif battle_enemy == "Sandmonster_2":
+            battle_enemy_img = img.load(battle_list[12]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 1000
+            battle_enemy_maxhp = 1000
+            battle_enemy_attack = 100
+            battle_enemy_gold = 300
+        elif battle_enemy == "Slime_1":
+            # Randomizes the skin used
+            temp = random.randint(1, 5)
+            battle_enemy_img = img.load(battle_list[12+temp]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 1300
+            battle_enemy_maxhp = 1300
+            battle_enemy_attack = 150
+            battle_enemy_gold = 500
+        elif battle_enemy == "Sandwizard_1":
+            battle_enemy_img = img.load(battle_list[18]).convert_alpha()
+            battle_enemy_x = 1700
+            battle_enemy_y = 650
+            battle_enemy_hp = 1300
+            battle_enemy_maxhp = 1300
+            battle_enemy_attack = 150
+            battle_enemy_gold = 500
 
 
         state = "Battle"
@@ -2999,7 +3302,19 @@ def updates():
                         elif shop_i_selected == "heal_1":
                             player_.potion_healinv += 1
                         elif shop_i_selected == "brave_1":
-                            player_.potion_braveinv += 1        
+                            player_.potion_braveinv += 1
+
+                        elif shop_i_selected == "scroll_1":
+                            battle_unlocked_fire = True
+                        elif shop_i_selected == "scroll_2":
+                            battle_unlocked_ice = True
+                        elif shop_i_selected == "scroll_3":
+                            player_.magic_attack *= 2
+                        elif shop_i_selected == "scroll_4":
+                            player_.magic_attack *= 3
+                        elif shop_i_selected == "scroll_5":
+                            player_.magic_attack *= 4
+
                         shop_i_health = "n/a"
                         shop_i_attack = "n/a"
                         shop_i_special = "n/a"
@@ -3128,6 +3443,78 @@ def updates():
                         shop_i_special = "None"
                         shop_i_selected = "shield_5"
                         shop_i_name = "Ultra Shield"
+                    elif item.type_ == 14:
+                        # sword_5
+                        shop_i_attack = "200"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "300"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_5"
+                        shop_i_name = "Ultra Sword"
+                    elif item.type_ == 15:
+                        # shield_6
+                        shop_i_attack = "n/a"
+                        shop_i_health = "1000"
+                        shop_i_cost = "600"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_6"
+                        shop_i_name = "Cursed Shield"
+                    elif item.type_ == 16:
+                        # sword_6
+                        shop_i_attack = "400"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "600"
+                        shop_i_special = "None"
+                        shop_i_selected = "sword_6"
+                        shop_i_name = "Cursed Sword"
+                    elif item.type_ == 17:
+                        # shield_7
+                        shop_i_attack = "n/a"
+                        shop_i_health = "2000"
+                        shop_i_cost = "1000"
+                        shop_i_special = "None"
+                        shop_i_selected = "shield_7"
+                        shop_i_name = "Force field"
+                    elif item.type_ == 18:
+                        # scroll_1
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "300"
+                        shop_i_special = "Cast fire on your enemies."
+                        shop_i_selected = "scroll_1"
+                        shop_i_name = "Scroll of fire"
+                    elif item.type_ == 19:
+                        # scroll_2
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "300"
+                        shop_i_special = "Cast ice on your enemies."
+                        shop_i_selected = "scroll_2"
+                        shop_i_name = "Scroll of ice"
+                    elif item.type_ == 20:
+                        # scroll_3
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "400"
+                        shop_i_special = "Double your magic."
+                        shop_i_selected = "scroll_3"
+                        shop_i_name = "Scroll of doubling"
+                    elif item.type_ == 21:
+                        # scroll_4
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "600"
+                        shop_i_special = "Triple your magic."
+                        shop_i_selected = "scroll_4"
+                        shop_i_name = "Scroll of tripling"
+                    elif item.type_ == 22:
+                        # scroll_5
+                        shop_i_attack = "n/a"
+                        shop_i_health = "n/a"
+                        shop_i_cost = "900"
+                        shop_i_special = "Quadruple your magic."
+                        shop_i_selected = "scroll_5"
+                        shop_i_name = "Scroll of Quadrupling"
                 else:
                     exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             else:

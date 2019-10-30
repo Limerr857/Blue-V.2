@@ -28,7 +28,9 @@
 
 # slice 2
 "img/Backdrops/Level_3_2.png"
-[[46, 1420, 132], [46, 237, 572], [47, 1354, 720], [49, 582, 99], [54, 0, 1037]]
+[[46, 1420, 132], [46, 237, 372], [47, 1354, 720], [49, 582, 99], [54, 0, 1037], [67, 529, 167], [36, 582, 432]]
+["Hello! I sell magic spells and other wizardry! [PRESS SPACE]"]
+[18, 19, 20, 21, 22]
 
 # slice 3
 "img/Backdrops/Level_3_3.png"
@@ -36,7 +38,9 @@
 
 # slice 4
 "img/Backdrops/Level_3_4.png"
-[[50, 88, 200], [51, 1587, 540], [56, 1877, 0]]
+[[50, 88, 200], [51, 1587, 540], [56, 1877, 0], [65, 208, 274], [4, 261, 636]]
+["Better equipment as usual then... [PRESS SPACE]"]
+[13, 14, 15, 16, 17]
 
 # slice 5
 "img/Backdrops/Level_3_5.png"
@@ -44,11 +48,13 @@
 
 # slice 6
 "img/Backdrops/Level_3_6.png"
-[[47, 892, 130], [46, 1522, 606], [48, 390, 555], [58, 0, 0]]
+[[47, 892, 130], [46, 1522, 606], [58, 0, 0], [68, 53, 342]]
 
 # slice 7
 "img/Backdrops/Level_3_7.png"
-[[52, 0, 738], [49, 1293, 683], [59, 1877, 0]]
+[[52, 0, 738], [49, 1293, 683], [59, 1877, 0], [66, 334, 163], [3, 387, 468]]
+["Hello again! Nice to mee... Oh, you want to buy potions, go right ahead! [PRESS SPACE]"]
+[10, 11]
 
 # slice 8
 "img/Backdrops/Level_3_8.png"
