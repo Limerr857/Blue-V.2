@@ -556,7 +556,7 @@ class Player():
                         level_current = 2
                         state = "Explore_update"
                         # HERE WE GO!
-                        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                        music_track_1 = pygame.mixer.music.load("sound/music/level_2.mp3")
                         came_from = None
                         level = lvl_2
                         leveln = "lvl_2"
@@ -581,7 +581,7 @@ class Player():
                         level_current = 3
                         state = "Explore_update"
                         # HERE WE GO!
-                        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                        music_track_1 = pygame.mixer.music.load("sound/music/level_3.mp3")
                         came_from = None
                         level = lvl_3
                         leveln = "lvl_3"
@@ -2559,7 +2559,12 @@ def re_draw():
         if battle_state == "Won":
             if music_on and music_bplayed == False:
                 pygame.mixer.music.stop()
-                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                if level_current == 1:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_1.mp3")
+                elif level_current == 2:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_2.mp3")
+                elif level_current == 3:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_3.mp3")
                 pygame.mixer.music.play(-1)
                 music_bplayed = True
             win.blit(battle_won, (0, 0))
@@ -2602,7 +2607,12 @@ def re_draw():
         if battle_state == "Lost":
             if music_on and music_bplayed == False:
                 pygame.mixer.music.stop()
-                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                if level_current == 1:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_1.mp3")
+                elif level_current == 2:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_2.mp3")
+                elif level_current == 3:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_3.mp3")
                 pygame.mixer.music.play(-1)
                 music_bplayed = True
             win.blit(battle_lost, (0, 0))
@@ -2635,7 +2645,12 @@ def re_draw():
         if battle_state == "Retreated":
             if music_on and music_bplayed == False:
                 pygame.mixer.music.stop()
-                music_track_5 = pygame.mixer.music.load("sound/music/ambience.mp3")
+                if level_current == 1:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_1.mp3")
+                elif level_current == 2:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_2.mp3")
+                elif level_current == 3:
+                    music_track_5 = pygame.mixer.music.load("sound/music/level_3.mp3")
                 pygame.mixer.music.play(-1)
                 music_bplayed = True
             win.blit(battle_retreated, (0, 0))
@@ -3132,7 +3147,7 @@ def updates():
 
     elif state == "Load_new":
         global music_track_1
-        music_track_1 = pygame.mixer.music.load("sound/music/ambience.mp3")
+        music_track_1 = pygame.mixer.music.load("sound/music/level_1.mp3")
         came_from = None
         # TODO: REMOVE THESE, temporary!!!!
         level = lvl_3
