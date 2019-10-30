@@ -401,6 +401,7 @@ class Player():
         global pos
         global credits_music_played
         global credits_y
+        global NPC_group
 
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
@@ -572,6 +573,10 @@ class Player():
                             txt_pos_x = 0
                             txt_pos_y = 0
                         break
+                    else:
+                        txt = roboto_15.render("", False, (0, 0, 0))
+                        txt_pos_x = 0
+                        txt_pos_y = 0
                 else:
                     txt = roboto_15.render("", False, (0, 0, 0))
                     txt_pos_x = 0
@@ -617,6 +622,7 @@ class Player():
                         came_from = None
                         level = lvl_2
                         leveln = "lvl_2"
+                        NPC_group = pygame.sprite.Group()
                         slice_ = level.get_startslice(leveln)
                         pos = level.get_startpos(leveln)
                         ex_x = pos[0]
@@ -642,6 +648,7 @@ class Player():
                         came_from = None
                         level = lvl_3
                         leveln = "lvl_3"
+                        NPC_group = pygame.sprite.Group()
                         slice_ = level.get_startslice(leveln)
                         pos = level.get_startpos(leveln)
                         ex_x = pos[0]
@@ -659,6 +666,7 @@ player_ = Player()
 
 
 class Object__(pygame.sprite.Sprite):
+    global NPC_group
     def __init__(self, type, location):
         pygame.sprite.Sprite.__init__(self)
         self.type = type
@@ -1636,6 +1644,14 @@ def re_draw():
     global save_selected
     global slot
     global music_on
+    global speedrun_time
+    global NPC_group
+    global shop_i_attack
+    global shop_i_health
+    global shop_i_cost
+    global shop_i_special 
+    global shop_i_selected
+    global shop_i_name
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -1730,6 +1746,7 @@ def re_draw():
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE]:
                 state = "Pause_update"
+        speedrun_time += 1
                 
 
     elif state == "Explore_update":
@@ -1857,6 +1874,15 @@ def re_draw():
                         exec("item_{}.rect.y = {}".format(nr, 114))
                         a += 1
                         
+        for item in items_group:
+            item.clicked = False
+        shop_i_attack = "n/a"
+        shop_i_health = "n/a"
+        shop_i_cost = "n/a"
+        shop_i_special = "None"
+        shop_i_selected = "n/a"
+        shop_i_name = "n/a"
+
         state = "Shop"
     
 
@@ -1883,6 +1909,7 @@ def re_draw():
             win.blit(txt4, (1570, 510))
             win.blit(txt5, (1570, 779))
             win.blit(txt6, (1570, 642))
+        speedrun_time += 1
 
 
     elif state == "Battle":
@@ -2132,6 +2159,10 @@ def re_draw():
                     if temp < 10:
                         battle_queue.append("e_slash")
                     else:
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                         battle_queue.append("e_shot")
                 elif battle_enemy == "Sandwizard_1":
                     temp = random.randint(1, 10)
@@ -2687,6 +2718,10 @@ def re_draw():
                         battle_queue.append("e_slash")
                     else:
                         battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
+                        battle_queue.append("e_shot")
                 elif battle_enemy == "Sandwizard_1":
                     temp = random.randint(1, 10)
                     if temp < 6:
@@ -2857,6 +2892,8 @@ def re_draw():
             battle_start_time = 0
             battle_state = "Start"
 
+        speedrun_time += 1
+
 
     elif state == "Battle_update":
         battle_prevx = player_.rect.x
@@ -2987,7 +3024,7 @@ def re_draw():
             battle_enemy_hp = 1300
             battle_enemy_maxhp = 1300
             battle_enemy_attack = 240
-            battle_enemy_gold = 500
+            battle_enemy_gold = 450
         elif battle_enemy == "Sandwizard_1":
             battle_enemy_img = img.load(battle_list[18]).convert_alpha()
             battle_enemy_x = 1700
@@ -3184,8 +3221,13 @@ def re_draw():
             pygame.mixer.music.play(-1)
             credits_music_played = True
         win.blit(background, (0, 0))
-        win.blit(credits_skip, (1727, 995))
         win.blit(credits_, (0, credits_y))
+        win.blit(credits_skip, (1727, 995))
+        if credits_y > 100:
+            txt = roboto_30.render("You finished in " + str(round(speedrun_time/60, 2)) + " seconds.", True, (0, 0, 0))
+        else:
+            txt = roboto_15.render("", False, (0, 0, 0))
+        win.blit(txt, (750, 10))
         credits_y -= 1
         if credits_y < -9300:
             state = "Title"
@@ -3215,21 +3257,21 @@ def re_draw():
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
                 player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
                 battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
-                music_on], f)
+                music_on, speedrun_time], f)
         elif slot == 2:
             with open('saves/save2.pkl', 'wb') as f:
                 pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
                 player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
                 battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
-                music_on], f)
+                music_on, speedrun_time], f)
         elif slot == 3:
             with open('saves/save3.pkl', 'wb') as f:
                 pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
                 player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
                 player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y,
                 battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot,
-                music_on], f)
+                music_on, speedrun_time], f)
         state = "Pause_update"
     
 
@@ -3237,13 +3279,13 @@ def re_draw():
         # Getting back the objects:
         if slot == 1:
             with open('saves/save1.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on, speedrun_time] = pickle.load(f)
         elif slot == 2:
             with open('saves/save2.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on, speedrun_time] = pickle.load(f)
         elif slot == 3:
             with open('saves/save3.pkl', 'rb') as f:
-                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on] = pickle.load(f)
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y, battle_unlocked_brave, battle_unlocked_ice, battle_unlocked_fire, battle_unlocked_heal, battle_unlocked_shot, music_on, speedrun_time] = pickle.load(f)
         
         if music_on:
             pygame.mixer.music.stop()
@@ -3442,6 +3484,8 @@ def updates():
     global x
     global y
     global load_selected
+    global speedrun_time
+    global NPC_group
 
     if state == "Title":
         if music_played == False:
@@ -3573,6 +3617,8 @@ def updates():
         level_size = level.get_levelsize(leveln)
         if music_on:
             pygame.mixer.music.play(-1)
+
+        speedrun_time = 0
 
         state = "Explore_update"
 
