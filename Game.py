@@ -4,6 +4,7 @@ from pygame import image as img
 import time
 import math
 import random
+import pickle
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -16,7 +17,7 @@ clock = pygame.time.Clock()
 Title_selected = None
 Options_selected = None
 Play_selected = None
-Load_game_disabled = True
+Load_game_disabled = False
 player_state = "normal"
 object_list = [
     
@@ -37,7 +38,7 @@ object_list = [
                "img/obj/temple_1_8.png", "img/obj/temple_1_9.png", "img/battle/sandmonster_1.png", "img/battle/sandmonster_2.png", 
                "img/battle/slime_1.png", "img/obj/forge_3.png", "img/obj/potion_2.png", "img/obj/magic_1.png",
                "img/obj/sandwizard_1.png", "img/NPC/YOU_1.png", "img/obj/temple_1_5_2.png", "img/obj/temple_1_5_3.png", 
-               "img/obj/temple_1_5_4.png", "img/obj/temple_1_5_5.png"
+               "img/obj/temple_1_5_4.png", "img/obj/temple_1_5_5.png", "img/princess_3.png"
 
                ]
 player_width = 100
@@ -115,6 +116,8 @@ shop_i_selected = "None"
 shop_i_bought = []
 shop_i_name = "n/a"
 
+credits_music_played = False
+
 x,y = 0,0
 
 pause_selected = None
@@ -188,6 +191,17 @@ effect_fire = img.load("img/effect/effect_fire.png").convert_alpha()
 effect_ice = img.load("img/effect/effect_ice.png").convert_alpha()
 effect_heal = img.load("img/effect/effect_heal.png").convert_alpha()
 effect_brave = img.load("img/effect/effect_brave.png").convert_alpha()
+
+credits_ = img.load("img/credits.png").convert_alpha()
+credits_skip = img.load("img/skip.png").convert_alpha()
+
+load_choose_save = img.load("img/menu/choose_save.png").convert_alpha()
+load_slot_1 = img.load("img/menu/slot_1.png").convert_alpha()
+load_slot_2 = img.load("img/menu/slot_2.png").convert_alpha()
+load_slot_3 = img.load("img/menu/slot_3.png").convert_alpha()
+load_slot_1_isselected = img.load("img/menu/slot_1_isselected.png").convert_alpha()
+load_slot_2_isselected = img.load("img/menu/slot_2_isselected.png").convert_alpha()
+load_slot_3_isselected = img.load("img/menu/slot_3_isselected.png").convert_alpha()
 
 roboto_15 = pygame.font.Font("font/Roboto-Bold.ttf", 15)
 roboto_30 = pygame.font.Font("font/Roboto-Bold.ttf", 30)
@@ -347,10 +361,8 @@ class Player():
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
         self.inventory = []
-        # Temporary
-        self.money = 99999
-        self.attack = 9999
-        # Not temporary
+        self.money = 15
+        self.attack = 15
         self.potion_power = 100
         self.potion_healinv = 0
         self.potion_braveinv = 0
@@ -383,6 +395,8 @@ class Player():
         global level 
         global leveln 
         global pos
+        global credits_music_played
+        global credits_y
 
 
         if pygame.sprite.spritecollideany(self, group1, pygame.sprite.collide_mask) != None:
@@ -533,6 +547,22 @@ class Player():
                                     # Player wants to start the fight
                                     state = "Battle_update"
                                     battle_enemy = "YOU"
+                        elif obj.type == 74:
+                            if level_current == 3:
+                                # The real princess
+                                txt = lvl_3.get_text("lvl_3", slice_)
+                                txt = txt[1]
+                                txt = roboto_15.render(txt, True, (0, 0, 0))
+                                txt_pos_x = 44
+                                txt_pos_y = 397
+
+                                keys = pygame.key.get_pressed()
+
+                                if keys[pygame.K_SPACE]:
+                                    # Player wants to end the game
+                                    state = "Credits"
+                                    credits_music_played = False
+                                    credits_y = 1080
                         break
                 else:
                     txt = roboto_15.render("", False, (0, 0, 0))
@@ -772,6 +802,8 @@ class Object__(pygame.sprite.Sprite):
             Temple_1_5_4.__init__(self)
         elif type == 73:
             Temple_1_5_5.__init__(self)
+        elif type == 74:
+            NPC_princess_3.__init__(self)
 
     def setup(self):
         self.size = self.image.get_rect().size
@@ -1287,6 +1319,13 @@ class Temple_1_5_5(Object__):
         self.setup()
         self.rect = self.image.get_rect()
 
+class NPC_princess_3(Object__):
+    def __init__(self):
+        self.image = img.load(object_list[70]).convert_alpha()
+        self.setup()
+        self.rect = self.image.get_rect()
+        NPC_group.add(self)
+
 
 class Item(pygame.sprite.Sprite):
     
@@ -1583,6 +1622,11 @@ def re_draw():
     global music_bplayed
     global music_track_5
     global Items_empty
+    global credits_music_played
+    global credits_y
+    global load_selected
+    global save_selected
+    global slot
 
     if state == "Title":
         win.blit(background, (0,0))
@@ -1676,7 +1720,7 @@ def re_draw():
             win.blit(txt, (txt_pos_x, txt_pos_y))
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE]:
-                state = "Pause"
+                state = "Pause_update"
                 
 
     elif state == "Explore_update":
@@ -2987,7 +3031,8 @@ def re_draw():
                 elif pause_selected == "main_menu":
                     pause_state = "m_sure"
                 elif pause_selected == "save":
-                    state = "save"
+                    state = "save_menu"
+                    time.sleep(0.2)
                 elif pause_selected == "exit_game":
                     pause_state = "e_sure"
                 elif pause_selected == "reset_pos":
@@ -3073,9 +3118,188 @@ def re_draw():
 
 
     elif state == "Pause_update":
+        global save_selected
         pause_state = "normal"
         state = "Pause"
         pause_selected = None
+        save_selected = None
+
+
+    elif state == "Credits":
+        if credits_music_played == False and music_on == True:
+            music_track_6 = pygame.mixer.music.load("sound/music/credits.mp3")
+            pygame.mixer.music.play(-1)
+            credits_music_played = True
+        win.blit(background, (0, 0))
+        win.blit(credits_skip, (1727, 995))
+        win.blit(credits_, (0, credits_y))
+        credits_y -= 1
+        if credits_y < -10130:
+            state = "Title"
+            Title_selected = None
+            if music_on == True:
+                music_track_6 = pygame.mixer.music.load("sound/music/menu.mp3")
+                pygame.mixer.music.play(-1)
+
+
+        x, y = pygame.mouse.get_pos()
+        
+        if x > 1727 and y > 995:
+            mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+            if mouse_1:
+                state = "Title"
+                Title_selected = None
+                if music_on == True:
+                    music_track_6 = pygame.mixer.music.load("sound/music/menu.mp3")
+                    pygame.mixer.music.play(-1)
+
+    
+    elif state == "save":
+        # Saving the objects:
+        if slot == 1:
+            with open('saves/save1.pkl', 'wb') as f:
+                pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
+                player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
+                ], f)
+        elif slot == 2:
+            with open('saves/save2.pkl', 'wb') as f:
+                pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
+                player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
+                ], f)
+        elif slot == 3:
+            with open('saves/save3.pkl', 'wb') as f:
+                pickle.dump([level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack,
+                player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv,
+                player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y
+                ], f)
+        print("YEEES")
+        state = "Pause_update"
+    
+
+    elif state == "load":
+        # Getting back the objects:
+        if slot == 1:
+            with open('saves/save1.pkl', 'rb') as f:
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+        elif slot == 2:
+            with open('saves/save2.pkl', 'rb') as f:
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+        elif slot == 3:
+            with open('saves/save3.pkl', 'rb') as f:
+                [level, leveln, level_current, level_size, player_.money, player_.maxhp, player_.magic_attack, player_.inventory, player_.attack, player_.rect.x, player_.rect.y, battle_bosses_killed, player_.potion_healinv, player_.potion_braveinv, player_.potion_power, player_.ranged_attack, shop_i_bought, slice_, ex_x, ex_y] = pickle.load(f)
+        
+        state = "Explore_update"
+
+
+    elif state == "load_menu":
+        win.blit(background, (0, 0))
+
+        mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+        if mouse_1:
+            if load_selected == "slot_1":
+                slot = 1
+                state = "load"
+            elif load_selected == "slot_2":
+                slot = 2
+                state = "load"
+            elif load_selected == "slot_3":
+                slot = 3
+                state = "load"
+            elif load_selected == None:
+                slot = None
+
+        x, y = pygame.mouse.get_pos()
+
+        if x > 825 and x < 1100:
+            if y > 256 and y < 410:
+                load_selected = "slot_1"
+            elif y > 410 and y < 564:
+                load_selected = "slot_2"
+            elif y > 564 and y < 718:
+                load_selected = "slot_3"
+            else:
+                load_selected = None
+        else:
+            load_selected = None
+
+        if load_selected == "slot_1":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1_isselected, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+        elif load_selected == "slot_2":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2_isselected, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+        elif load_selected == "slot_3":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3_isselected, (0, 564))
+        elif load_selected == None:
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))   
+
+
+    elif state == "save_menu":
+        win.blit(background, (0, 0))
+
+        mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+        if mouse_1:
+            if save_selected == "slot_1":
+                slot = 1
+                state = "save"
+                time.sleep(0.2)
+            elif save_selected == "slot_2":
+                slot = 2
+                state = "save"
+                time.sleep(0.2)
+            elif save_selected == "slot_3":
+                slot = 3
+                state = "save"
+                time.sleep(0.2)
+
+        x, y = pygame.mouse.get_pos()
+
+        if x > 825 and x < 1100:
+            if y > 256 and y < 410:
+                save_selected = "slot_1"
+            elif y > 410 and y < 564:
+                save_selected = "slot_2"
+            elif y > 564 and y < 718:
+                save_selected = "slot_3"
+            else:
+                save_selected = None
+        else:
+            save_selected = None
+
+        if save_selected == "slot_1":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1_isselected, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+        elif save_selected == "slot_2":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2_isselected, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+        elif save_selected == "slot_3":
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3_isselected, (0, 564))
+        elif save_selected == None:
+            win.blit(load_choose_save, (0, 0))
+            win.blit(load_slot_1, (0, 256))
+            win.blit(load_slot_2, (0, 410))
+            win.blit(load_slot_3, (0, 564))
+        
+        
 
 
 def updates():
@@ -3121,6 +3345,7 @@ def updates():
     global level_size
     global x
     global y
+    global load_selected
 
     if state == "Title":
         if music_played == False:
@@ -3215,17 +3440,34 @@ def updates():
             if Play_selected == "New_game":
                 state = "Load_new"
                 Play_selected = None
+            if Play_selected == "Load_game":
+                state = "load_menu"
+                Play_selected = None
+                load_selected = None
+                time.sleep(0.2)
 
 
     elif state == "Load_new":
         global music_track_1
         music_track_1 = pygame.mixer.music.load("sound/music/level_1.mp3")
         came_from = None
-        # TODO: REMOVE THESE, temporary!!!!
-        level = lvl_3
-        leveln = "lvl_3"
-        level_current = 3
-        # not
+        level = lvl_1
+        leveln = "lvl_1"
+        level_current = 1
+        player_.inventory = []
+        player_.money = 15
+        player_.attack = 15
+        player_.potion_power = 100
+        player_.potion_healinv = 0
+        player_.potion_braveinv = 0
+        player_.brave = False
+        player_.iced = False
+        player_.ranged_attack = 0
+        player_.magic_attack = 30
+        player_.hp = 100
+        player_.maxhp = 100
+        battle_bosses_killed = []
+        shop_i_bought = []
         slice_ = level.get_startslice(leveln)
         pos = level.get_startpos(leveln)
         ex_x = pos[0]

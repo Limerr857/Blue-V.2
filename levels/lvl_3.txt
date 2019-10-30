@@ -26,6 +26,9 @@
 "img/Backdrops/Level_3_1.png"
 [[48, 1647, 93], [48, 424, 394], [49, 1412, 506], [53, 1877, 1037]]
 
+# slice 1 spawns
+[[62, 400], [63, 2000]]
+
 # slice 2
 "img/Backdrops/Level_3_2.png"
 [[46, 1420, 132], [46, 237, 372], [47, 1354, 720], [49, 582, 99], [54, 0, 1037], [67, 529, 167], [36, 582, 432]]
@@ -36,6 +39,9 @@
 "img/Backdrops/Level_3_3.png"
 [[49, 375, 607], [50, 821, 160], [51, 1170, 743], [51, 1547, 494], [55, 0, 1037]]
 
+# slice 3 spawns
+[[64, 300], [63, 1000]]
+
 # slice 4
 "img/Backdrops/Level_3_4.png"
 [[50, 88, 200], [51, 1587, 540], [56, 1877, 0], [65, 208, 274], [4, 261, 636]]
@@ -44,8 +50,8 @@
 
 # slice 5
 "img/Backdrops/Level_3_5.png"
-[[57, 0, 0], [70, 42, 0], [71, 1877, 0], [72, 42, 1037], [73, 960, 42], [69, 1003, 490]]
-["Finally we meet! I am your long lost evil twin and now we will have the battle of the century! [PRESS SPACE TO FIGHT]"]
+[[57, 0, 0], [70, 42, 0], [71, 1877, 0], [72, 42, 1037], [73, 960, 42], [69, 1003, 490], [74, 42, 411]]
+["Finally we meet! I am your long lost evil twin and now we will have the battle of the century! [PRESS SPACE TO FIGHT]", "Thank you for saving me! Here, take this credits animation. [PRESS SPACE TO OBTAIN THE CREDITS]"]
 
 # slice 6
 "img/Backdrops/Level_3_6.png"
@@ -61,11 +67,15 @@
 "img/Backdrops/Level_3_8.png"
 [[46, 211, 623], [47, 1017, 133], [50, 1192, 776], [50, 1592, 475], [60, 0, 0]]
 
+# slice 8 spawns
+[[63, 700], [62, 500], [64, 10000]]
+
 # slice 9
 "img/Backdrops/Level_3_9.png"
 [[48, 364, 176], [48, 1000, 540], [49, 1702, 656], [51, 1507, 232], [61, 0, 0]]
 
-
+# slice 8 spawns
+[[63, 700], [62, 500], [64, 10000]]
 
 
 
