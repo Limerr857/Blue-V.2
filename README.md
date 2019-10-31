@@ -16,5 +16,5 @@ You will have to have the following installed:
 - Python 3.7 (3.8 or any 3.X should work)
 - Pygame (pip install pygame)
 
-1. Download the Blue_V.2_source.zip file and uncompress it.
+1. Download the Blue_V.2_Source.zip file and uncompress it.
 2. Start Game.py
