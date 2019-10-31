@@ -3474,8 +3474,6 @@ def re_draw():
             win.blit(load_slot_3, (0, 564))
             win.blit(load_back, (0, 926))
         
-        
-
 
 def updates():
     global Title_selected
@@ -4034,7 +4032,6 @@ def updates():
             else:
                 exec("item_{}.image = img.load('img/item/{}.png')".format(x_, item.name), globals())
             x_ += 1
-
 
 
 run = True
