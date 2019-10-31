@@ -2597,6 +2597,20 @@ def re_draw():
             elif battle_animation == "e_brave":
                 win.blit(effect_brave, (1307, 611))
 
+            if battle_menu == 2:
+                win.blit(battle_menu_3, (1344, 0))
+                mouse_1, mouse_2, mouse_3 = pygame.mouse.get_pressed()
+
+                if mouse_1:
+                    if b_x >= 1344 and b_x <= 1920: 
+                        # Mouse is probably over one of the buttons on the left.
+                        if b_y >= 126 and b_y <= 226:
+                            # Clicked on the Yes, retreat button
+                            battle_state = "Retreated"
+                        elif b_y >= 235 and b_y <= 335:
+                            # Clicked on the No button
+                            battle_menu = 1
+
 
             win.blit(player_.image_battle, player_.rect)
             win.blit(battle_enemy_img, (battle_enemy_x, battle_enemy_y))
@@ -2796,8 +2810,31 @@ def re_draw():
                                 objects_group.remove(obj)
                                 if obj.type not in battle_bosses_killed:
                                     battle_bosses_killed.append(obj.type)
+                                    break
                     state = "Explore_update"
                     battle_state = "normal"
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_w] or keys[pygame.K_a] or keys[pygame.K_s] or keys[pygame.K_d] or keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_RETURN] or keys[pygame.K_ESCAPE]:
+                dist = 300
+                for obj in enemies_group.sprites():
+                    center1 = obj.rect.center
+                    center2 = player_.rect.center
+
+                    diff_x = abs(center1[0] - center2[0])
+                    diff_y = abs(center1[1] - center2[1])
+
+                    # Pythagorean theorem
+                    if diff_x**2 + diff_y**2 <= dist**2:
+                        # Check so that the enemy is in the same frame
+                        if obj.slice_ == slice_:
+                            enemies_group.remove(obj)
+                            objects_group.remove(obj)
+                            if obj.type not in battle_bosses_killed:
+                                battle_bosses_killed.append(obj.type)
+                                break
+                state = "Explore_update"
+                battle_state = "normal"
 
 
         if battle_state == "Lost":
@@ -2921,96 +2958,96 @@ def re_draw():
             battle_enemy_gold = 100
         elif battle_enemy == "Zombie_1":
             battle_enemy_img = img.load(battle_list[1]).convert_alpha()
-            battle_enemy_x = 1800
-            battle_enemy_y = 750
+            battle_enemy_x = 1557
+            battle_enemy_y = 761
             battle_enemy_hp = 100
             battle_enemy_maxhp = 100
             battle_enemy_attack = 15
             battle_enemy_gold = 15
         elif battle_enemy == "Door_1":
             battle_enemy_img = img.load(battle_list[2]).convert()
-            battle_enemy_x = 1500
-            battle_enemy_y = 600
+            battle_enemy_x = 1404
+            battle_enemy_y = 496
             battle_enemy_hp = 200
             battle_enemy_maxhp = 200
             battle_enemy_attack = 30
             battle_enemy_gold = 20
         elif battle_enemy == "Demon_1":
             battle_enemy_img = img.load(battle_list[3]).convert_alpha()
-            battle_enemy_x = 1800
-            battle_enemy_y = 750
+            battle_enemy_x = 1557
+            battle_enemy_y = 761
             battle_enemy_hp = 250
             battle_enemy_maxhp = 250
             battle_enemy_attack = 35
             battle_enemy_gold = 20
         elif battle_enemy == "Knight_1":
             battle_enemy_img = img.load(battle_list[4]).convert_alpha()
-            battle_enemy_x = 1800
-            battle_enemy_y = 750
+            battle_enemy_x = 1557
+            battle_enemy_y = 761
             battle_enemy_hp = 350
             battle_enemy_maxhp = 350
             battle_enemy_attack = 30
             battle_enemy_gold = 30
         elif battle_enemy == "Knight_3":
             battle_enemy_img = img.load(battle_list[5]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1507
+            battle_enemy_y = 661
             battle_enemy_hp = 420
             battle_enemy_maxhp = 420
             battle_enemy_attack = 40
             battle_enemy_gold = 200
         elif battle_enemy == "Zombie_2_1":
             battle_enemy_img = img.load(battle_list[6]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1507
+            battle_enemy_y = 661
             battle_enemy_hp = 800
             battle_enemy_maxhp = 800
             battle_enemy_attack = 130
             battle_enemy_gold = 250
         elif battle_enemy == "Demon_2":
             battle_enemy_img = img.load(battle_list[7]).convert_alpha()
-            battle_enemy_x = 1650
-            battle_enemy_y = 600
+            battle_enemy_x = 1457
+            battle_enemy_y = 559
             battle_enemy_hp = 1000
             battle_enemy_maxhp = 1000
             battle_enemy_attack = 300
             battle_enemy_gold = 500
         elif battle_enemy == "Zombiewizard_1":
             battle_enemy_img = img.load(battle_list[8]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1551
+            battle_enemy_y = 655
             battle_enemy_hp = 500
             battle_enemy_maxhp = 500
             battle_enemy_attack = 40
             battle_enemy_gold = 100
         elif battle_enemy == "Zombiewizard_2":
             battle_enemy_img = img.load(battle_list[9]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1551
+            battle_enemy_y = 655
             battle_enemy_hp = 500
             battle_enemy_maxhp = 500
             battle_enemy_attack = 40
             battle_enemy_gold = 100
         elif battle_enemy == "Zombiewizard_3":
             battle_enemy_img = img.load(battle_list[10]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1551
+            battle_enemy_y = 655
             battle_enemy_hp = 650
             battle_enemy_maxhp = 650
             battle_enemy_attack = 70
             battle_enemy_gold = 120
         elif battle_enemy == "Sandmonster_1":
             battle_enemy_img = img.load(battle_list[11]).convert_alpha()
-            battle_enemy_x = 1800
-            battle_enemy_y = 750
+            battle_enemy_x = 1557
+            battle_enemy_y = 761
             battle_enemy_hp = 900
             battle_enemy_maxhp = 900
             battle_enemy_attack = 300
             battle_enemy_gold = 200
         elif battle_enemy == "Sandmonster_2":
             battle_enemy_img = img.load(battle_list[12]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1507
+            battle_enemy_y = 661
             battle_enemy_hp = 1300
             battle_enemy_maxhp = 1300
             battle_enemy_attack = 300
@@ -3019,24 +3056,24 @@ def re_draw():
             # Randomizes the skin used
             temp = random.randint(1, 5)
             battle_enemy_img = img.load(battle_list[12+temp]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1507
+            battle_enemy_y = 661
             battle_enemy_hp = 1300
             battle_enemy_maxhp = 1300
             battle_enemy_attack = 240
             battle_enemy_gold = 450
         elif battle_enemy == "Sandwizard_1":
             battle_enemy_img = img.load(battle_list[18]).convert_alpha()
-            battle_enemy_x = 1700
-            battle_enemy_y = 650
+            battle_enemy_x = 1507
+            battle_enemy_y = 561
             battle_enemy_hp = 2400
             battle_enemy_maxhp = 2400
             battle_enemy_attack = 500
             battle_enemy_gold = 500
         elif battle_enemy == "YOU":
             battle_enemy_img = img.load(battle_list[19]).convert_alpha()
-            battle_enemy_x = 1800
-            battle_enemy_y = 750
+            battle_enemy_x = 1557
+            battle_enemy_y = 761
             battle_enemy_hp = player_.maxhp * 2
             battle_enemy_maxhp = player_.hp * 2
             battle_enemy_attack = player_.attack * 1.5
